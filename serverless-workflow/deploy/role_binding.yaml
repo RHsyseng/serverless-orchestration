@@ -1,0 +1,11 @@
+apiVersion: rbac.authorization.k8s.io/v1
+# This role binding allows "jane" to read pods in the "default" namespace.
+kind: RoleBinding
+metadata:
+  name: workflow-service
+subjects:
+- kind: ServiceAccount
+  name: workflow-service
+roleRef:
+  kind: Role
+  name: workflow-reader

@@ -1,0 +1,41 @@
+{
+  "name": "example-workflow",
+  "states": [
+    {
+      "start": true,
+      "type": "OPERATION",
+      "name": "Operation node",
+      "action-mode": "SEQUENTIAL",
+      "filter": {
+        "input-path": "$.country",
+        "result-path": "$.iso",
+        "output-path": "$.country.iso"
+      },
+      "actions": [
+        {
+          "filter": {
+            "input-path": "$.country",
+            "result-path": "$.iso",
+            "output-path": "$.country.iso"
+          },
+          "function": {
+            "name": "Function 1",
+            "metadata": {
+              "Type": "Rest",
+              "Url": "http://localhost/f1"
+            }
+          }
+        }
+      ],
+      "next-state": "End node"
+    },
+    {
+      "status": "FAILURE",
+      "name": "End node",
+      "type": "END",
+      "filter": {
+        "input-path": "$.country"
+      }
+    }
+  ]
+}

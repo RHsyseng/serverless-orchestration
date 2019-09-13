@@ -1,0 +1,70 @@
+{
+  "name": "example-workflow",
+  "states": [
+    {
+      "start": true,
+      "type": "OPERATION",
+      "name": "Calculate user is an adult",
+      "action-mode": "SEQUENTIAL",
+      "actions": [
+        {
+          "function": {
+            "name": "Set adult",
+            "metadata": {
+              "Type": "Rest",
+              "Url": "http://test-services:8080/age"
+            }
+          }
+        },
+        {
+          "function": {
+            "name": "Log is adult",
+            "metadata": {
+              "Type": "Log",
+              "Field": "$.adult",
+              "Level": "INFO"
+            }
+          }
+        }
+      ],
+      "next-state": "Calculate country code"
+    },
+    {
+      "type": "OPERATION",
+      "name": "Calculate country code",
+      "action-mode": "SEQUENTIAL",
+      "filter": {
+        "input-path": "$.country",
+        "result-path": "$.iso",
+        "output-path": "$.country.iso"
+      },
+      "actions": [
+        {
+          "function": {
+            "name": "Set country code",
+            "metadata": {
+              "Type": "Rest",
+              "Url": "http://test-services:8080/country"
+            }
+          }
+        },
+        {
+          "function": {
+            "name": "Log country code",
+            "metadata": {
+              "Type": "Log",
+              "Field": "$.iso",
+              "Level": "INFO"
+            }
+          }
+        }
+      ],
+      "next-state": "end"
+    },
+    {
+      "status": "SUCCESS",
+      "name": "end",
+      "type": "END"
+    }
+  ]
+}

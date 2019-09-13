@@ -1,0 +1,46 @@
+{
+  "name": "example-workflow",
+  "states": [
+    {
+      "start": true,
+      "type": "OPERATION",
+      "name": "Operation node",
+      "action-mode": "SEQUENTIAL",
+      "actions": [
+        {
+          "function": {
+            "name": "Function 1",
+            "metadata": {
+              "Type": "Rest",
+              "Url": "http://localhost/f1"
+            }
+          }
+        }
+      ],
+      "next-state": "Switch node"
+    },
+    {
+      "name": "Switch node",
+      "type": "SWITCH",
+      "choices": [
+        {
+          "path": "$.foo",
+          "value": true,
+          "operator": "EQ",
+          "next-state": "Failure end"
+        }
+      ],
+      "default": "End node"
+    },
+    {
+      "status": "FAILURE",
+      "name": "Failure end",
+      "type": "END"
+    },
+    {
+      "status": "SUCCESS",
+      "name": "End node",
+      "type": "END"
+    }
+  ]
+}
