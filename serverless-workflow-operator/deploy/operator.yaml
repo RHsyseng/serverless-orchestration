@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: serverless-orchestration-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: serverless-orchestration-operator
+  template:
+    metadata:
+      labels:
+        name: serverless-orchestration-operator
+    spec:
+      serviceAccountName: serverless-orchestration-operator
+      containers:
+        - name: serverless-orchestration-operator
+          image: quay.io/xiezhang7/serverless-orchestration-operator:0.1
+          command:
+          - serverless-orchestration-operator
+          imagePullPolicy: Always
+          env:
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: "serverless-orchestration-operator"
