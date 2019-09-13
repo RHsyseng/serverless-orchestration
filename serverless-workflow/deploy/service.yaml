@@ -1,0 +1,14 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: workflow-service
+  labels:
+    app: workflow-service
+spec:
+  selector:
+    deployment: workflow-service
+    app: workflow-service
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080

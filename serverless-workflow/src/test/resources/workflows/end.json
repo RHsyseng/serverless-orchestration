@@ -1,0 +1,11 @@
+{
+  "name": "example-workflow",
+  "states": [
+    {
+      "start": true,
+      "status": "FAILURE",
+      "name": "End node",
+      "type": "END"
+    }
+  ]
+}

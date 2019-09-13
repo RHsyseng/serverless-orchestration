@@ -1,0 +1,82 @@
+{
+  "name": "example-workflow",
+  "states": [
+    {
+      "start": true,
+      "type": "OPERATION",
+      "name": "Calculate user is an adult",
+      "action-mode": "SEQUENTIAL",
+      "actions": [
+        {
+          "function": {
+            "name": "Set adult",
+            "metadata": {
+              "Type": "Rest",
+              "Url": "http://test-services:8080/age"
+            }
+          }
+        }
+      ],
+      "next-state": "Only adults allowed"
+    },
+    {
+      "name": "Only adults allowed",
+      "type": "SWITCH",
+      "choices": [
+        {
+          "path": "$.adult",
+          "value": true,
+          "operator": "EQ",
+          "next-state": "Log allowed"
+        }
+      ],
+      "default": "Log not allowed"
+    },
+    {
+      "type": "OPERATION",
+      "name": "Log allowed",
+      "action-mode": "SEQUENTIAL",
+      "actions": [
+        {
+          "function": {
+            "name": "Log user is adult",
+            "metadata": {
+              "Type": "Log",
+              "Field": "$.adult",
+              "Level": "INFO"
+            }
+          }
+        }
+      ],
+      "next-state": "Allow access"
+    },
+    {
+      "type": "OPERATION",
+      "name": "Log not allowed",
+      "action-mode": "SEQUENTIAL",
+      "actions": [
+        {
+          "function": {
+            "name": "User is NOT adult",
+            "metadata": {
+              "Type": "Log",
+              "Field": "$.name",
+              "Level": "ERROR"
+            }
+          }
+        }
+      ],
+      "next-state": "Access not allowed"
+    },
+    {
+      "status": "SUCCESS",
+      "name": "Allow access",
+      "type": "END"
+    },
+    {
+      "status": "FAILURE",
+      "name": "Access not allowed",
+      "type": "END"
+    }
+  ]
+}

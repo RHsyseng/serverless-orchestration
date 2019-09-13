@@ -1,0 +1,28 @@
+{
+  "name": "example-workflow",
+  "states": [
+    {
+      "start": true,
+      "type": "OPERATION",
+      "name": "Operation node",
+      "action-mode": "SEQUENTIAL",
+      "actions": [
+        {
+          "function": {
+            "name": "Function 1",
+            "metadata": {
+              "Type": "Rest",
+              "Url": "http://localhost/f1"
+            }
+          }
+        }
+      ],
+      "next-state": "End node"
+    },
+    {
+      "status": "FAILURE",
+      "name": "End node",
+      "type": "END"
+    }
+  ]
+}
