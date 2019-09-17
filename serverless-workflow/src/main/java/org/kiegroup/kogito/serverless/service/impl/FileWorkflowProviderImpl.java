@@ -71,7 +71,7 @@ public class FileWorkflowProviderImpl implements WorkflowProvider {
         }
         if (workflow != null) {
             List<ValidationError> validationErrors = new WorkflowValidator().forWorkflow(workflow).validate();
-            if (!validationErrors.isEmpty()) {
+            if (validationErrors.isEmpty()) {
                 return workflow;
             } else {
                 logger.warn("Workflow not updated. Provided workflow has validation errors: {}", validationErrors);

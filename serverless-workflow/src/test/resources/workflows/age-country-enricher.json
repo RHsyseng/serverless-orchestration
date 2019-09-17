@@ -12,7 +12,7 @@
             "name": "Set adult",
             "metadata": {
               "Type": "Rest",
-              "Url": "http://localhost:8080/age"
+              "Url": "http://test-services.192.168.39.232.xip.io/age"
             }
           }
         },

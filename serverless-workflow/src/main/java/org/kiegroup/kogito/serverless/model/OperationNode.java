@@ -6,7 +6,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.jbpm.ruleflow.core.RuleFlowProcessFactory;
 import org.jbpm.ruleflow.core.factory.WorkItemNodeFactory;
-import org.kiegroup.kogito.workitem.handler.LifecycleWorkItemHandler;
+import org.kiegroup.kogito.workitem.handler.BaseWorkItemHandler;
 import org.kiegroup.kogito.workitem.handler.LogWorkItemHandler;
 import org.kiegroup.kogito.workitem.handler.RestWorkItemHandler;
 import org.serverless.workflow.api.actions.Action;
@@ -62,9 +62,9 @@ class OperationNode extends GraphNode {
         }
         WorkItemNodeFactory wi = factory.workItemNode(id)
             .name(function.getName())
-            .inMapping(LifecycleWorkItemHandler.PARAM_CONTENT_DATA, JsonModel.DATA_PARAM)
-            .outMapping(LifecycleWorkItemHandler.PARAM_RESULT, JsonModel.DATA_PARAM)
-            .workName(function.getMetadata().get(LifecycleWorkItemHandler.PARAM_TYPE));
+            .inMapping(BaseWorkItemHandler.PARAM_CONTENT_DATA, JsonModel.DATA_PARAM)
+            .outMapping(BaseWorkItemHandler.PARAM_RESULT, JsonModel.DATA_PARAM)
+            .workName(function.getMetadata().get(BaseWorkItemHandler.PARAM_TYPE));
         if (RestWorkItemHandler.HANDLER_NAME.equals(type)) {
             buildRestWorkItem(wi, function);
         } else if (LogWorkItemHandler.HANDLER_NAME.equals(type)) {
@@ -96,11 +96,9 @@ class OperationNode extends GraphNode {
     }
 
     private void buildRestWorkItem(WorkItemNodeFactory wi, Function function) {
-        wi.workParameter(RestWorkItemHandler.PARAM_TASK_NAME, RestWorkItemHandler.HANDLER_NAME)
-            .workParameter(RestWorkItemHandler.PARAM_CONTENT_TYPE, MediaType.APPLICATION_JSON);
+        wi.workParameter(RestWorkItemHandler.PARAM_TASK_NAME, RestWorkItemHandler.HANDLER_NAME);
         addWorkParameterFromMetadata(wi, RestWorkItemHandler.PARAM_METHOD, function.getMetadata());
         addWorkParameterFromMetadata(wi, RestWorkItemHandler.PARAM_URL, function.getMetadata());
-        addWorkParameterFromMetadata(wi, RestWorkItemHandler.PARAM_CONTENT_TYPE, function.getMetadata());
         //TODO: Implement retry
         //TODO: Implement timeout
     }

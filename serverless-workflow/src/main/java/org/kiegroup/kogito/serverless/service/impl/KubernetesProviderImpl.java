@@ -10,6 +10,8 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 
+import io.fabric8.kubernetes.client.Config;
+import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -38,7 +40,8 @@ public class KubernetesProviderImpl implements WorkflowProvider {
 
     @PostConstruct
     public void init() {
-        client = new DefaultKubernetesClient();
+        Config config = new ConfigBuilder().withNamespace("default").build();
+        client = new DefaultKubernetesClient(config);
     }
 
     @Override
