@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
-public class LogWorkItemHandler implements LifecycleWorkItemHandler {
+public class LogWorkItemHandler implements BaseWorkItemHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(LogWorkItemHandler.class);
 
@@ -55,14 +55,6 @@ public class LogWorkItemHandler implements LifecycleWorkItemHandler {
     @Override
     public String getName() {
         return HANDLER_NAME;
-    }
-
-    @Override
-    public void onStartup() {
-    }
-
-    @Override
-    public void onShutdown() {
     }
 
     private String parseMessage(WorkItem workItem) {
