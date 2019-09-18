@@ -1,14 +1,14 @@
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
-  name: serverlessorchestrationapps.app.kiegroup.org
+  name: workflows.app.kiegroup.org
 spec:
   group: app.kiegroup.org
   names:
-    kind: ServerlessOrchestrationApp
-    listKind: ServerlessOrchestrationAppList
-    plural: serverlessorchestrationapps
-    singular: serverlessorchestrationapp
+    kind: Workflow
+    listKind: WorkflowList
+    plural: workflows
+    singular: workflow
   scope: Namespaced
   subresources:
     status: {}
@@ -16,14 +16,16 @@ spec:
     openAPIV3Schema:
       properties:
         apiVersion:
-          description: 'APIVersion defines the versioned schema of this representation
+          description:
+            "APIVersion defines the versioned schema of this representation
             of an object. Servers should convert recognized schemas to the latest
-            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources"
           type: string
         kind:
-          description: 'Kind is a string value representing the REST resource this
+          description:
+            "Kind is a string value representing the REST resource this
             object represents. Servers may infer this from the endpoint the client
-            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds"
           type: string
         metadata:
           type: object
@@ -33,17 +35,10 @@ spec:
               type: string
             image:
               type: string
-            name:
-              type: string
-            ports:
-              items:
-                type: object
-              type: array
+            watch:
+              type: boolean
           required:
-          - name
-          - definition
-          - image
-          - ports
+            - definition
           type: object
         status:
           properties:
@@ -60,17 +55,18 @@ spec:
                     type: string
                   type: array
                 stopped:
-                  description: Deployments are not starting, unclear what next step
+                  description:
+                    Deployments are not starting, unclear what next step
                     will be
                   items:
                     type: string
                   type: array
               type: object
           required:
-          - deployments
+            - deployments
           type: object
   version: v1alpha1
   versions:
-  - name: v1alpha1
-    served: true
-    storage: true
+    - name: v1alpha1
+      served: true
+      storage: true

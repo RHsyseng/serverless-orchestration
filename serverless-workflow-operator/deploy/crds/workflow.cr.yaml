@@ -1,14 +1,8 @@
 apiVersion: app.kiegroup.org/v1alpha1
-kind: ServerlessOrchestrationApp
+kind: Workflow
 metadata:
-  name: workflow-service
+  name: example-workflow
 spec:
-  name: workflow-service
-  image: quay.io/ruben/workflow-service:1.0
-  ports:
-    - name: http
-      protocol: TCP
-      containerPort: 8080
   definition: |-
     {
       "name": "example-workflow",

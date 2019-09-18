@@ -1,0 +1,54 @@
+apiVersion: app.kiegroup.org/v1alpha1
+kind: Workflow
+metadata:
+  name: example-workflow
+spec:
+  definition:
+    states:
+      - start: true
+        type: OPERATION
+        name: Calculate user is an adult
+        action-mode: SEQUENTIAL
+        actions:
+          - function:
+            name: Set adult
+            metadata:
+              type: Rest
+              url: http://test-services:8080/age
+        next-state: Only adults allowed
+      - name: Only adults allowd
+        type: SWITCH
+        choices:
+          - path: $.adult
+            value: true
+            operator: EQ
+            next-state: Log allowed
+        default: Log not allowed
+      - name: Log allowed
+        type: OPERATION
+        action-mode: SEQUENTIAL
+        next-state: Allow access
+        actions:
+          - function:
+              name: Log user is adult
+              metadata:
+                type: Log
+                field: $.adult
+                level: INFO
+      - name: Log not allowed
+        type: OPERATION
+        action-mode: SEQUENTIAL
+        next-state: Access not allowed
+        actions:
+          - function:
+              name: User is NOT adult
+              metadata:
+                - type: Log
+                  field: $.name
+                  level: ERROR
+      - name: Allow access
+        type: END
+        status: SUCCESS
+      - name: Access not allowed
+        type: END
+        status: FAILURE

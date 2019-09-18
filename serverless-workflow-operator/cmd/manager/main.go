@@ -11,8 +11,8 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/client-go/rest"
 
-	"github.com/kiegroup/serverless-orchestration-operator/pkg/apis"
-	"github.com/kiegroup/serverless-orchestration-operator/pkg/controller"
+	"github.com/RHsyseng/serverless-orchestration/serverless-workflow-operator/pkg/apis"
+	"github.com/RHsyseng/serverless-orchestration/serverless-workflow-operator/pkg/controller"
 
 	"github.com/operator-framework/operator-sdk/pkg/k8sutil"
 	kubemetrics "github.com/operator-framework/operator-sdk/pkg/kube-metrics"

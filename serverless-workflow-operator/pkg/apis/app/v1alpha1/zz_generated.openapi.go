@@ -11,17 +11,17 @@ import (
 
 func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenAPIDefinition {
 	return map[string]common.OpenAPIDefinition{
-		"./pkg/apis/app/v1alpha1.ServerlessOrchestrationApp":       schema_pkg_apis_app_v1alpha1_ServerlessOrchestrationApp(ref),
-		"./pkg/apis/app/v1alpha1.ServerlessOrchestrationAppSpec":   schema_pkg_apis_app_v1alpha1_ServerlessOrchestrationAppSpec(ref),
-		"./pkg/apis/app/v1alpha1.ServerlessOrchestrationAppStatus": schema_pkg_apis_app_v1alpha1_ServerlessOrchestrationAppStatus(ref),
+		"github.com/RHsyseng/serverless-orchestration/serverless-workflow-operator/pkg/apis/app/v1alpha1.Workflow":       schema_pkg_apis_app_v1alpha1_Workflow(ref),
+		"github.com/RHsyseng/serverless-orchestration/serverless-workflow-operator/pkg/apis/app/v1alpha1.WorkflowSpec":   schema_pkg_apis_app_v1alpha1_WorkflowSpec(ref),
+		"github.com/RHsyseng/serverless-orchestration/serverless-workflow-operator/pkg/apis/app/v1alpha1.WorkflowStatus": schema_pkg_apis_app_v1alpha1_WorkflowStatus(ref),
 	}
 }
 
-func schema_pkg_apis_app_v1alpha1_ServerlessOrchestrationApp(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_app_v1alpha1_Workflow(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ServerlessOrchestrationApp is the Schema for the serverlessorchestrationapps API",
+				Description: "Workflow is the Schema for the workflows API",
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
@@ -44,34 +44,28 @@ func schema_pkg_apis_app_v1alpha1_ServerlessOrchestrationApp(ref common.Referenc
 					},
 					"spec": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("./pkg/apis/app/v1alpha1.ServerlessOrchestrationAppSpec"),
+							Ref: ref("github.com/RHsyseng/serverless-orchestration/serverless-workflow-operator/pkg/apis/app/v1alpha1.WorkflowSpec"),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("./pkg/apis/app/v1alpha1.ServerlessOrchestrationAppStatus"),
+							Ref: ref("github.com/RHsyseng/serverless-orchestration/serverless-workflow-operator/pkg/apis/app/v1alpha1.WorkflowStatus"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"./pkg/apis/app/v1alpha1.ServerlessOrchestrationAppSpec", "./pkg/apis/app/v1alpha1.ServerlessOrchestrationAppStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+			"github.com/RHsyseng/serverless-orchestration/serverless-workflow-operator/pkg/apis/app/v1alpha1.WorkflowSpec", "github.com/RHsyseng/serverless-orchestration/serverless-workflow-operator/pkg/apis/app/v1alpha1.WorkflowStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
 	}
 }
 
-func schema_pkg_apis_app_v1alpha1_ServerlessOrchestrationAppSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_app_v1alpha1_WorkflowSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ServerlessOrchestrationAppSpec defines the desired state of ServerlessOrchestrationApp",
+				Description: "WorkflowSpec defines the desired state of Workflow",
 				Properties: map[string]spec.Schema{
-					"name": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
 					"definition": {
 						SchemaProps: spec.SchemaProps{
 							Type:   []string{"string"},
@@ -84,32 +78,25 @@ func schema_pkg_apis_app_v1alpha1_ServerlessOrchestrationAppSpec(ref common.Refe
 							Format: "",
 						},
 					},
-					"ports": {
+					"watch": {
 						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("k8s.io/api/core/v1.ContainerPort"),
-									},
-								},
-							},
+							Type:   []string{"boolean"},
+							Format: "",
 						},
 					},
 				},
-				Required: []string{"name", "definition", "image", "ports"},
+				Required: []string{"definition", "image", "watch"},
 			},
 		},
-		Dependencies: []string{
-			"k8s.io/api/core/v1.ContainerPort"},
+		Dependencies: []string{},
 	}
 }
 
-func schema_pkg_apis_app_v1alpha1_ServerlessOrchestrationAppStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_app_v1alpha1_WorkflowStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "ServerlessOrchestrationAppStatus defines the observed state of ServerlessOrchestrationApp",
+				Description: "WorkflowStatus defines the observed state of Workflow",
 				Properties: map[string]spec.Schema{
 					"deployments": {
 						SchemaProps: spec.SchemaProps{
