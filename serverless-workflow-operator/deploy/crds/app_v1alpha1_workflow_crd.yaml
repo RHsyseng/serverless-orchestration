@@ -111,6 +111,8 @@ spec:
               type: object
             image:
               type: string
+            knative:
+              type: boolean
             watch:
               type: boolean
           required:

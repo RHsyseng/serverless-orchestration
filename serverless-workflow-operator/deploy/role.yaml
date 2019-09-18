@@ -5,14 +5,13 @@ items:
     kind: Role
     metadata:
       creationTimestamp: null
-      name: serverless-workflow-operator
+      name: workflow-operator
     rules:
       - apiGroups:
           - ""
           - app.kiegroup.org
-          - apps.openshift.io
           - rbac.authorization.k8s.io
-          - route.openshift.io
+          - serving.knative.dev
         resources:
           - "*"
         verbs:
@@ -40,7 +39,7 @@ items:
       - apiGroups:
           - apps
         resourceNames:
-          - serverless-workflow-operator
+          - workflow-operator
         resources:
           - deployments/finalizers
         verbs:

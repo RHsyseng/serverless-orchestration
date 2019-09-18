@@ -2,7 +2,7 @@ FROM registry.access.redhat.com/ubi8/ubi-minimal:latest
 
 ENV OPERATOR=/usr/local/bin/serverless-workflow-operator \
     USER_UID=1001 \
-    USER_NAME=serverless-workflow-operator
+    USER_NAME=workflow-operator
 
 # install operator binary
 COPY build/_output/bin/serverless-workflow-operator ${OPERATOR}

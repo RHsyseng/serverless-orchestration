@@ -83,6 +83,12 @@ func schema_pkg_apis_app_v1alpha1_WorkflowSpec(ref common.ReferenceCallback) com
 							Format: "",
 						},
 					},
+					"knative": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"boolean"},
+							Format: "",
+						},
+					},
 				},
 				Required: []string{"definition"},
 			},
