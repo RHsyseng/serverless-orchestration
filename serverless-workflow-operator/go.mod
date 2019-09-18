@@ -1,4 +1,4 @@
-module github.com/kiegroup/serverless-orchestration-operator
+module github.com/RHsyseng/serverless-orchestration/serverless-workflow-operator
 
 require (
 	github.com/NYTimes/gziphandler v1.0.1 // indirect

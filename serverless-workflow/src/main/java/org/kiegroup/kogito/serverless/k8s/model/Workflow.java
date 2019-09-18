@@ -8,10 +8,10 @@ public class Workflow extends CustomResource {
 
     public static final CustomResourceDefinition CUSTOM_RESOURCE_DEFINITION = new CustomResourceDefinitionBuilder()
         .withApiVersion("apiextensions.k8s.io/v1beta1")
-        .withNewMetadata().withName("serverlessorchestrationapps.app.kiegroup.org").endMetadata()
+        .withNewMetadata().withName("workflows.app.kiegroup.org").endMetadata()
         .withNewSpec().withGroup("app.kiegroup.org").withVersion("v1alpha1").withScope("Namespaced")
-            .withNewNames().withKind("ServerlessOrchestrationApp")
-            .withShortNames("serverlessorchestrationapp").withPlural("serverlessorchestrationapps").endNames()
+        .withNewNames().withKind("Workflow")
+        .withShortNames("workflow").withPlural("workflows").endNames()
         .endSpec()
         .build();
 

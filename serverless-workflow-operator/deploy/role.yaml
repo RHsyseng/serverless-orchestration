@@ -1,44 +1,60 @@
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  creationTimestamp: null
-  name: serverless-orchestration-operator
-rules:
-  - apiGroups:
-      - ""
-      - app.kiegroup.org
-      - apps.openshift.io
-      - rbac.authorization.k8s.io
-      - route.openshift.io
-    resources:
-      - "*"
-    verbs:
-      - "*"
-  - apiGroups:
-      - ""
-    resources:
-      - namespaces
-    verbs:
-      - get
-  - apiGroups:
-      - apps
-    resources:
-      - deployments
-      - replicasets
-    verbs:
-      - "*"
-  - apiGroups:
-      - monitoring.coreos.com
-    resources:
-      - servicemonitors
-    verbs:
-      - get
-      - create
-  - apiGroups:
-      - apps
-    resourceNames:
-      - serverless-orchestration-operator
-    resources:
-      - deployments/finalizers
-    verbs:
-      - update
+apiVersion: v1
+kind: List
+items:
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      creationTimestamp: null
+      name: serverless-workflow-operator
+    rules:
+      - apiGroups:
+          - ""
+          - app.kiegroup.org
+          - apps.openshift.io
+          - rbac.authorization.k8s.io
+          - route.openshift.io
+        resources:
+          - "*"
+        verbs:
+          - "*"
+      - apiGroups:
+          - ""
+        resources:
+          - namespaces
+        verbs:
+          - get
+      - apiGroups:
+          - apps
+        resources:
+          - deployments
+          - replicasets
+        verbs:
+          - "*"
+      - apiGroups:
+          - monitoring.coreos.com
+        resources:
+          - servicemonitors
+        verbs:
+          - get
+          - create
+      - apiGroups:
+          - apps
+        resourceNames:
+          - serverless-workflow-operator
+        resources:
+          - deployments/finalizers
+        verbs:
+          - update
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      name: workflow-reader
+    rules:
+      - apiGroups:
+          - app.kiegroup.org
+        resources:
+          - workflows
+        verbs:
+          - get
+          - watch
+          - list
