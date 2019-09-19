@@ -16,7 +16,7 @@ import org.serverless.workflow.api.states.OperationState;
 
 class OperationNode extends GraphNode {
 
-    private static final String WORKITEM_TYPE = "Type";
+    private static final String WORKITEM_TYPE = "type";
 
     private final OperationState state;
 

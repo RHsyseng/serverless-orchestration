@@ -15,7 +15,7 @@ spec:
       serviceAccountName: serverless-workflow-operator
       containers:
         - name: serverless-workflow-operator
-          image: quay.io/xiezhang7/serverless-workflow-operator:0.1
+          image: quay.io/ruben/serverless-workflow-operator:latest
           command:
           - serverless-workflow-operator
           imagePullPolicy: Always

@@ -1,15 +1,20 @@
 package org.kiegroup.kogito.serverless.model;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.kie.api.definition.process.Process;
 import org.serverless.workflow.api.Workflow;
-import org.serverless.workflow.api.mapper.WorkflowObjectMapper;
+import org.serverless.workflow.api.WorkflowManager;
 import org.serverless.workflow.api.states.DefaultState;
+import org.serverless.workflow.spi.WorkflowManagerProvider;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -17,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GraphTest {
 
-    private final WorkflowObjectMapper mapper = new WorkflowObjectMapper();
+    private final WorkflowManager manager = WorkflowManagerProvider.getInstance().get();
 
     @Test
     void testEnd() {
@@ -83,7 +88,6 @@ class GraphTest {
     void testOperationProcess() {
         Graph graph = load("operation.json");
         assertNotNull(graph.getProcess());
-
     }
 
     @Test
@@ -105,11 +109,12 @@ class GraphTest {
     }
 
     private Graph load(String name) {
-        InputStream is = this.getClass().getClassLoader().getResourceAsStream("workflows/" + name);
+        URL file = this.getClass().getClassLoader().getResource("workflows/" + name);
         Workflow workflow = null;
         try {
-            workflow = mapper.readValue(is, Workflow.class);
-        } catch (IOException e) {
+            String content = Files.lines(Paths.get(file.toURI())).collect(Collectors.joining(System.lineSeparator()));
+            workflow = manager.setMarkup(content).getWorkflow();
+        } catch (IOException | URISyntaxException e) {
             Assertions.fail("Unable to load workflow", e);
         }
         return new Graph(workflow);

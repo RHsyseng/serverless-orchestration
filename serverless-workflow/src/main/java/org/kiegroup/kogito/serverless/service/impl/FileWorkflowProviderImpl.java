@@ -2,24 +2,24 @@ package org.kiegroup.kogito.serverless.service.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.jbpm.process.core.Work;
 import org.kiegroup.kogito.serverless.service.WorkflowProvider;
 import org.serverless.workflow.api.Workflow;
-import org.serverless.workflow.api.mapper.WorkflowObjectMapper;
+import org.serverless.workflow.api.WorkflowManager;
 import org.serverless.workflow.api.validation.ValidationError;
-import org.serverless.workflow.api.validation.WorkflowValidator;
+import org.serverless.workflow.spi.WorkflowManagerProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +33,7 @@ public class FileWorkflowProviderImpl implements WorkflowProvider {
 
     public static final String SOURCE = "file";
 
-    private final WorkflowObjectMapper mapper = new WorkflowObjectMapper();
+    private final WorkflowManager manager = WorkflowManagerProvider.getInstance().get();
 
     @ConfigProperty(
         name = ENV_WORKFLOW_DIR,
@@ -44,7 +44,7 @@ public class FileWorkflowProviderImpl implements WorkflowProvider {
     @Override
     public List<Workflow> getAll() {
         Path path = Paths.get(workflowDir.get());
-        if(!Files.isDirectory(path)) {
+        if (!Files.isDirectory(path)) {
             return null;
         }
         List<Workflow> workflows = new ArrayList<>();
@@ -64,19 +64,19 @@ public class FileWorkflowProviderImpl implements WorkflowProvider {
     private Workflow readWorkflow(Path path) {
         Workflow workflow = null;
         try {
-            byte[] file = Files.readAllBytes(path);
-            workflow = mapper.readValue(new ByteArrayInputStream(file), Workflow.class);
+            Stream<String> lines = Files.lines(path);
+            workflow = manager.setMarkup(lines.collect(Collectors.joining(System.lineSeparator()))).getWorkflow();
         } catch (IOException e) {
             logger.error("Unable to read provided workflow", e);
         }
         if (workflow != null) {
-            List<ValidationError> validationErrors = new WorkflowValidator().forWorkflow(workflow).validate();
+            List<ValidationError> validationErrors = manager.getWorkflowValidator().validate();
             if (validationErrors.isEmpty()) {
                 return workflow;
             } else {
                 logger.warn("Workflow not updated. Provided workflow has validation errors: {}", validationErrors);
             }
         }
-        return null;
+        throw new IllegalArgumentException("Invalid workflow provided");
     }
 }

@@ -48,7 +48,7 @@
       </dependency>
       <dependency>
         <groupId>org.servlerless</groupId>
-        <artifactId>workflow-api</artifactId>
+        <artifactId>workflow-impl</artifactId>
         <version>${workflow-api.version}</version>
       </dependency>
       <dependency>
@@ -66,7 +66,7 @@
   <dependencies>
     <dependency>
       <groupId>org.servlerless</groupId>
-      <artifactId>workflow-api</artifactId>
+      <artifactId>workflow-impl</artifactId>
     </dependency>
     <dependency>
       <groupId>org.kie.kogito</groupId>

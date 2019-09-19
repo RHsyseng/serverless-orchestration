@@ -21,8 +21,8 @@ public class RestWorkItemHandler implements BaseWorkItemHandler {
 
     public static final String HANDLER_NAME = "Rest";
     public static final String PARAM_TASK_NAME = "TaskName";
-    public static final String PARAM_URL = "Url";
-    public static final String PARAM_METHOD = "Method";
+    public static final String PARAM_URL = "url";
+    public static final String PARAM_METHOD = "method";
 
     @Override
     public void executeWorkItem(WorkItem workItem, WorkItemManager manager) {

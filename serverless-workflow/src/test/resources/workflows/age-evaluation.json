@@ -11,8 +11,8 @@
           "function": {
             "name": "Set adult",
             "metadata": {
-              "Type": "Rest",
-              "Url": "http://localhost:8080/age"
+              "type": "Rest",
+              "url": "http://localhost:8080/age"
             }
           }
         }
@@ -41,9 +41,9 @@
           "function": {
             "name": "Log user is adult",
             "metadata": {
-              "Type": "Log",
-              "Field": "$.adult",
-              "Level": "INFO"
+              "type": "Log",
+              "field": "$.adult",
+              "level": "INFO"
             }
           }
         }
@@ -59,9 +59,9 @@
           "function": {
             "name": "User is NOT adult",
             "metadata": {
-              "Type": "Log",
-              "Field": "$.name",
-              "Level": "ERROR"
+              "type": "Log",
+              "field": "$.name",
+              "level": "ERROR"
             }
           }
         }

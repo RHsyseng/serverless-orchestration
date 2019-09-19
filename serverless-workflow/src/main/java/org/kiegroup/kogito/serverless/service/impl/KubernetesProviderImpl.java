@@ -1,6 +1,5 @@
 package org.kiegroup.kogito.serverless.service.impl;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -19,7 +18,9 @@ import org.kiegroup.kogito.serverless.k8s.model.DoneableWorkflow;
 import org.kiegroup.kogito.serverless.k8s.model.WorkflowList;
 import org.kiegroup.kogito.serverless.service.WorkflowProvider;
 import org.serverless.workflow.api.Workflow;
-import org.serverless.workflow.api.mapper.WorkflowObjectMapper;
+import org.serverless.workflow.api.WorkflowManager;
+import org.serverless.workflow.api.validation.ValidationError;
+import org.serverless.workflow.spi.WorkflowManagerProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +36,7 @@ public class KubernetesProviderImpl implements WorkflowProvider {
     @ConfigProperty(name = ENV_WORKFLOW_LABELS)
     Optional<Map<String, String>> workflowLabels;
 
-    private final WorkflowObjectMapper mapper = new WorkflowObjectMapper();
+    private final WorkflowManager manager = WorkflowManagerProvider.getInstance().get();
     private KubernetesClient client;
 
     @PostConstruct
@@ -80,11 +81,16 @@ public class KubernetesProviderImpl implements WorkflowProvider {
             logger.warn("Workflow definition not found in provided resource");
             return null;
         }
-        try {
-            return mapper.readValue(workflow.getSpec().getDefinition(), Workflow.class);
-        } catch (IOException e) {
-            logger.error("Unable to read workflow definition", e);
+        Workflow result = manager.setMarkup(workflow.getSpec().getDefinition()).getWorkflow();
+        if (result.getName() == null) {
+            result.setName(workflow.getMetadata().getName());
         }
-        return null;
+        List<ValidationError> validationErrors = manager.getWorkflowValidator()
+            .validate();
+        if (validationErrors.isEmpty()) {
+            return manager.getWorkflow();
+        }
+        logger.error("Invalid workflow provided: {}", validationErrors);
+        throw new IllegalArgumentException("Invalid workflow provided");
     }
 }

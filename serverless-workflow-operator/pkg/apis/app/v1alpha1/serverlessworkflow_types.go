@@ -11,9 +11,77 @@ import (
 // WorkflowSpec defines the desired state of Workflow
 // +k8s:openapi-gen=true
 type WorkflowSpec struct {
-	Definition string `json:"definition"`
-	Image      string `json:"image"`
-	Watch      bool   `json:"watch"`
+	Definition Definition `json:"definition"`
+	Image      string     `json:"image,omitempty"`
+	Watch      bool       `json:"watch,omitempty"`
+}
+
+type Definition struct {
+	Metadata map[string]string `json:"metadata,omitempty"`
+	States   []State           `json:"states,omitempty"`
+}
+
+type State struct {
+	Name       string            `json:"name"`
+	Type       StateType         `json:"type"`
+	Start      bool              `json:"start,omitempty"`
+	Filter     Filter            `json:"filter,omitempty"`
+	NextState  string            `json:"next-state,omitempty"`
+	Choices    []Choice          `json:"choices,omitempty"`
+	ActionMode ActionModeType    `json:"action-mode,omitempty"`
+	Actions    []Action          `json:"actions,omitempty"`
+	Metadata   map[string]string `json:"metadata,omitempty"`
+}
+
+type Choice struct {
+	Path      string            `json:"path"`
+	Value     string            `json:"value"`
+	Operator  OperatorType      `json:"operator"`
+	NextState string            `json:"next-state"`
+	Metadata  map[string]string `json:"metadata,omitempty"`
+}
+
+type Action struct {
+	Function Function          `json:"function"`
+	Filter   Filter            `json:"filter,omitempty"`
+	Metadata map[string]string `json:"metadata,omitempty"`
+}
+
+type Function struct {
+	Name     string            `json:"name"`
+	Metadata map[string]string `json:"metadata,omitempty"`
+}
+
+type StateType string
+
+const (
+	operationState StateType = "OPERATION"
+	switchState    StateType = "SWITCH"
+	endState       StateType = "END"
+)
+
+type ActionModeType string
+
+const (
+	sequential ActionModeType = "SEQUENTIAL"
+	parallel   ActionModeType = "PARALLEL"
+)
+
+type OperatorType string
+
+const (
+	eq   OperatorType = "EQ"
+	lt   OperatorType = "LT"
+	lteq OperatorType = "LTEQ"
+	gt   OperatorType = "GT"
+	gteq OperatorType = "GTEQ"
+)
+
+type Filter struct {
+	InputPath  string            `json:"input-path,omitempty"`
+	ResultPath string            `json:"result-path,omitempty"`
+	OutputPath string            `json:"output-path,omitempty"`
+	Metadata   map[string]string `json:"metadata,omitempty"`
 }
 
 // WorkflowStatus defines the observed state of Workflow

@@ -68,8 +68,7 @@ func schema_pkg_apis_app_v1alpha1_WorkflowSpec(ref common.ReferenceCallback) com
 				Properties: map[string]spec.Schema{
 					"definition": {
 						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
+							Ref: ref("github.com/RHsyseng/serverless-orchestration/serverless-workflow-operator/pkg/apis/app/v1alpha1.Definition"),
 						},
 					},
 					"image": {
@@ -85,10 +84,11 @@ func schema_pkg_apis_app_v1alpha1_WorkflowSpec(ref common.ReferenceCallback) com
 						},
 					},
 				},
-				Required: []string{"definition", "image", "watch"},
+				Required: []string{"definition"},
 			},
 		},
-		Dependencies: []string{},
+		Dependencies: []string{
+			"github.com/RHsyseng/serverless-orchestration/serverless-workflow-operator/pkg/apis/app/v1alpha1.Definition"},
 	}
 }
 

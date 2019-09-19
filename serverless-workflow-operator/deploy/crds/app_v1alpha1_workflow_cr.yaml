@@ -11,16 +11,16 @@ spec:
         action-mode: SEQUENTIAL
         actions:
           - function:
-            name: Set adult
-            metadata:
-              type: Rest
-              url: http://test-services:8080/age
+              name: Set adult
+              metadata:
+                type: Rest
+                url: http://test-services:8080/age
         next-state: Only adults allowed
-      - name: Only adults allowd
+      - name: Only adults allowed
         type: SWITCH
         choices:
           - path: $.adult
-            value: true
+            value: "true"
             operator: EQ
             next-state: Log allowed
         default: Log not allowed
@@ -43,9 +43,9 @@ spec:
           - function:
               name: User is NOT adult
               metadata:
-                - type: Log
-                  field: $.name
-                  level: ERROR
+                type: Log
+                field: $.name
+                level: ERROR
       - name: Allow access
         type: END
         status: SUCCESS

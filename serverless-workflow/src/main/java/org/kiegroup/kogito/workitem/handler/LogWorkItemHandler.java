@@ -17,9 +17,9 @@ public class LogWorkItemHandler implements BaseWorkItemHandler {
     private static final Logger logger = LoggerFactory.getLogger(LogWorkItemHandler.class);
 
     public static final String HANDLER_NAME = "Log";
-    public static final String PARAM_MESSAGE = "Message";
-    public static final String PARAM_FIELD = "Field";
-    public static final String PARAM_LEVEL = "Level";
+    public static final String PARAM_MESSAGE = "message";
+    public static final String PARAM_FIELD = "field";
+    public static final String PARAM_LEVEL = "level";
     public static final Level DEFAULT_LEVEL = Level.DEBUG;
 
     private final JsonPath jsonPath = new JsonPath();
