@@ -1,1 +1,1 @@
-# serverless-orchestration-operator
+# serverless-workflow-operator

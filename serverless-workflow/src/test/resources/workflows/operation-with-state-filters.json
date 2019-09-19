@@ -16,8 +16,8 @@
           "function": {
             "name": "Function 1",
             "metadata": {
-              "Type": "Rest",
-              "Url": "http://localhost/f1"
+              "type": "Rest",
+              "url": "http://localhost/f1"
             }
           }
         }
