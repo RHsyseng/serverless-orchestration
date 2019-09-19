@@ -1,0 +1,66 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  labels:
+    application: infinispan-server
+  name: infinispan-server
+spec:
+  replicas: 1
+  serviceName: infinispan-server-headless
+  template:
+    metadata:
+      labels:
+        application: infinispan-server
+        deploymentConfig: infinispan-server
+      name: infinispan-server
+    spec:
+      containers:
+      - env:
+        - name: USER
+          valueFrom:
+            secretKeyRef:
+              key: application-user
+              name: infinispan-server
+        - name: PASS
+          valueFrom:
+            secretKeyRef:
+              key: application-password
+              name: infinispan-server
+        image: infinispan/server:latest
+        livenessProbe:
+          exec:
+            command:
+            - /opt/infinispan/bin/livenessProbe.sh
+          failureThreshold: 5
+          initialDelaySeconds: 10
+          periodSeconds: 60
+          successThreshold: 1
+          timeoutSeconds: 80
+        name: infinispan-server
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        - containerPort: 9990
+          name: management
+          protocol: TCP
+        - containerPort: 8888
+          name: ping
+          protocol: TCP
+        - containerPort: 11222
+          name: hotrod
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command:
+            - /opt/infinispan/bin/readinessProbe.sh
+          failureThreshold: 5
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 80
+        resources:
+          requests:
+            cpu: "0.5"
+            memory: 512Mi
+      terminationGracePeriodSeconds: 120

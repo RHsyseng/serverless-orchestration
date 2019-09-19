@@ -1,0 +1,33 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: workflow-service
+  name: workflow-service
+spec:
+  selector:
+    matchLabels:
+      deployment: workflow-service
+      app: workflow-service
+  template:
+    metadata:
+      labels:
+        app: workflow-service
+        deployment: workflow-service
+    spec:
+      serviceAccountName: workflow-service
+      containers:
+        - env:
+            - name: WORKFLOW_NAME
+              value: workflow-service
+            - name: WORKFLOW_SOURCE
+              value: k8s
+            - name: QUARKUS_INFINISPAN_CLIENT_SERVER_LIST
+              value: infinispan-server-hotrod:11222
+          image: quay.io/ruben/workflow-service:latest
+          imagePullPolicy: Always
+          name: workflow-service
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
