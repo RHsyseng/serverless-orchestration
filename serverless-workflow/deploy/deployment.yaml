@@ -22,6 +22,10 @@ spec:
               value: workflow-service
             - name: WORKFLOW_SOURCE
               value: k8s
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
           image: quay.io/ruben/workflow-service:latest
           imagePullPolicy: Always
           name: workflow-service

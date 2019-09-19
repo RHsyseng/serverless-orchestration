@@ -254,6 +254,14 @@ func newDeploymentForCR(cr *v1.Workflow) *appsv1.Deployment {
 									Name:  "WORKFLOW_SOURCE",
 									Value: "k8s",
 								},
+								{
+									Name: "NAMESPACE",
+									ValueFrom: &corev1.EnvVarSource{
+										FieldRef: &corev1.ObjectFieldSelector{
+											FieldPath: "metadata.namespace",
+										},
+									},
+								},
 							},
 						},
 					},

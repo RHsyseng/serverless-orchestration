@@ -30,18 +30,22 @@ public class KubernetesProviderImpl implements WorkflowProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(KubernetesProviderImpl.class);
     private static final String ENV_WORKFLOW_LABELS = "workflow-labels";
+    private static final String ENV_NAMESPACE = "namespace";
 
     static final String SOURCE = "k8s";
 
     @ConfigProperty(name = ENV_WORKFLOW_LABELS)
     Optional<Map<String, String>> workflowLabels;
 
+    @ConfigProperty(name = ENV_NAMESPACE, defaultValue = "default")
+    String namespace;
+
     private final WorkflowManager manager = WorkflowManagerProvider.getInstance().get();
     private KubernetesClient client;
 
     @PostConstruct
     public void init() {
-        Config config = new ConfigBuilder().withNamespace("default").build();
+        Config config = new ConfigBuilder().withNamespace(namespace).build();
         client = new DefaultKubernetesClient(config);
     }
 
