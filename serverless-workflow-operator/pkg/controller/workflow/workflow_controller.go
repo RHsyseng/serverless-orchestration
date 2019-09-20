@@ -120,7 +120,7 @@ func (r *ReconcileWorkflow) Reconcile(request reconcile.Request) (reconcile.Resu
 	// Define a RoleBinding
 	rb := newRoleBinding(instance)
 	rbObjectForCR := &objectForCR{rb, rb, &rb.ObjectMeta, "RoleBinding"}
-	if err = r.createObjectForCR(instance, rbObjectForCR, &corev1.ServiceAccount{}, reqLogger); err != nil {
+	if err = r.createObjectForCR(instance, rbObjectForCR, &authv1.RoleBinding{}, reqLogger); err != nil {
 		return reconcile.Result{}, err
 	}
 
