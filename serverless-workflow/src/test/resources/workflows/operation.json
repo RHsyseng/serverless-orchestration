@@ -10,8 +10,8 @@
         {
           "function": {
             "name": "Function 1",
-            "metadata": {
-              "type": "Rest",
+            "type": "Rest",
+            "parameters": {
               "url": "http://localhost/f1"
             }
           }

@@ -10,29 +10,15 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <surefire-plugin.version>2.22.0</surefire-plugin.version>
     <workflow-api.version>1.0-SNAPSHOT</workflow-api.version>
-    <quarkus.version>0.22.0</quarkus.version>
-    <graalvm.version>19.1.1</graalvm.version>
+    <version.io.quarkus>0.22.0</version.io.quarkus>
+    <graalvm.version>19.2.0</graalvm.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <kogito.version>0.3.0</kogito.version>
+    <kogito.version>0.4.0</kogito.version>
   </properties>
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>org.kie.kogito</groupId>
-        <artifactId>drools-bom</artifactId>
-        <version>${kogito.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.kie.kogito</groupId>
-        <artifactId>jbpm-bom</artifactId>
-        <version>${kogito.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
       <dependency>
         <groupId>org.kie.kogito</groupId>
         <artifactId>kogito-bom</artifactId>
@@ -43,7 +29,7 @@
       <dependency>
         <groupId>io.quarkus</groupId>
         <artifactId>quarkus-bom</artifactId>
-        <version>${quarkus.version}</version>
+        <version>${version.io.quarkus}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -138,7 +124,7 @@
       <plugin>
         <groupId>io.quarkus</groupId>
         <artifactId>quarkus-maven-plugin</artifactId>
-        <version>${quarkus.version}</version>
+        <version>${version.io.quarkus}</version>
         <executions>
           <execution>
             <goals>
@@ -180,7 +166,7 @@
           <plugin>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-maven-plugin</artifactId>
-            <version>${quarkus.version}</version>
+            <version>${version.io.quarkus}</version>
             <executions>
               <execution>
                 <goals>

@@ -108,6 +108,12 @@ class GraphTest {
         assertNotNull(graph.getProcess());
     }
 
+    @Test
+    void testHumanTaskProcess() {
+        Graph graph = load("human-task.json");
+        assertNotNull(graph.getProcess());
+    }
+
     private Graph load(String name) {
         URL file = this.getClass().getClassLoader().getResource("workflows/" + name);
         Workflow workflow = null;

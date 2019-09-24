@@ -12,8 +12,8 @@ spec:
         actions:
           - function:
               name: Set adult
-              metadata:
-                type: Rest
+              type: Rest
+              parameters:
                 url: http://test-services:8080/age
         next-state: Only adults allowed
       - name: Only adults allowed
@@ -31,8 +31,8 @@ spec:
         actions:
           - function:
               name: Log user is adult
-              metadata:
-                type: Log
+              type: Log
+              parameters:
                 field: $.adult
                 level: INFO
       - name: Log not allowed
@@ -42,8 +42,8 @@ spec:
         actions:
           - function:
               name: User is NOT adult
-              metadata:
-                type: Log
+              type: Log
+              parameters:
                 field: $.name
                 level: ERROR
       - name: Allow access

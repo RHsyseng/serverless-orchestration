@@ -10,8 +10,8 @@
         {
           "function": {
             "name": "Set adult",
-            "metadata": {
-              "type": "Rest",
+            "type": "Rest",
+            "parameters": {
               "url": "http://test-services.192.168.39.232.xip.io/age"
             }
           }
@@ -19,8 +19,8 @@
         {
           "function": {
             "name": "Log is adult",
-            "metadata": {
-              "type": "Log",
+            "type": "Log",
+            "parameters": {
               "field": "$.adult",
               "level": "INFO"
             }
@@ -42,8 +42,8 @@
         {
           "function": {
             "name": "Set country code",
-            "metadata": {
-              "type": "Rest",
+            "type": "Rest",
+            "parameters": {
               "url": "http://localhost:8080/country"
             }
           }
@@ -51,7 +51,7 @@
         {
           "function": {
             "name": "Log country code",
-            "metadata": {
+            "parameters": {
               "type": "Log",
               "field": "$.iso",
               "level": "INFO"
