@@ -2,7 +2,6 @@ package workflow
 
 import (
 	"context"
-
 	knsv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	"github.com/RHsyseng/operator-utils/pkg/olm"
@@ -132,15 +131,6 @@ func (r *ReconcileWorkflow) Reconcile(request reconcile.Request) (reconcile.Resu
 		if err = r.createObject(instance, serviceObjectForCR, &knsv1.Service{}, reqLogger); err != nil {
 			return reconcile.Result{}, err
 		}
-
-		// Update DC status
-		dInstance := &appsv1.Deployment{}
-		if err = r.client.Get(context.TODO(), types.NamespacedName{Name: instance.Name + "-v1-deployment", Namespace: instance.Namespace}, dInstance); err == nil {
-			instance.Status.Deployments = olm.GetDeploymentStatus([]appsv1.Deployment{*dInstance})
-			if err = r.client.Update(context.TODO(), instance); err != nil {
-				return reconcile.Result{}, err
-			}
-		}
 	} else {
 		// Define a Deployment
 		d := newDeployment(instance)
@@ -155,14 +145,14 @@ func (r *ReconcileWorkflow) Reconcile(request reconcile.Request) (reconcile.Resu
 		if err = r.createObject(instance, svcObjectForCR, &corev1.Service{}, reqLogger); err != nil {
 			return reconcile.Result{}, err
 		}
+	}
 
-		// Update DC status
-		dInstance := &appsv1.Deployment{}
-		if err = r.client.Get(context.TODO(), types.NamespacedName{Name: d.Name, Namespace: d.Namespace}, dInstance); err == nil {
-			instance.Status.Deployments = olm.GetDeploymentStatus([]appsv1.Deployment{*dInstance})
-			if err = r.client.Update(context.TODO(), instance); err != nil {
-				return reconcile.Result{}, err
-			}
+	// Update DC status
+	if dInstance := r.getDeployment(instance, reqLogger); dInstance != nil {
+		instance.Status.Deployments = olm.GetDeploymentStatus([]appsv1.Deployment{*dInstance})
+		reqLogger.Info("Update CR for deployment status")
+		if err = r.client.Update(context.TODO(), instance); err != nil {
+			return reconcile.Result{}, err
 		}
 	}
 
@@ -199,7 +189,7 @@ func (r *ReconcileWorkflow) createObject(cr *v1.Workflow,
 }
 
 const (
-	_defaultImage = "quay.io/ruben/workflow-service:latest"
+	_defaultImage = "quay.io/rhsyseng/workflow-service:latest"
 	_roleName     = "workflow-reader"
 )
 
@@ -254,41 +244,7 @@ func newDeployment(cr *v1.Workflow) *appsv1.Deployment {
 					Namespace: cr.Namespace,
 					Labels:    getDeploymentLabels(cr),
 				},
-				Spec: corev1.PodSpec{
-					Containers: []corev1.Container{
-						{
-							Name:            cr.Name,
-							Image:           getImage(cr),
-							ImagePullPolicy: corev1.PullAlways,
-							Ports: []corev1.ContainerPort{
-								{
-									Name:          "http",
-									Protocol:      "TCP",
-									ContainerPort: 8080,
-								},
-							},
-							Env: []corev1.EnvVar{
-								{
-									Name:  "WORKFLOW_NAME",
-									Value: cr.Name,
-								},
-								{
-									Name:  "WORKFLOW_SOURCE",
-									Value: "k8s",
-								},
-								{
-									Name: "NAMESPACE",
-									ValueFrom: &corev1.EnvVarSource{
-										FieldRef: &corev1.ObjectFieldSelector{
-											FieldPath: "metadata.namespace",
-										},
-									},
-								},
-							},
-						},
-					},
-					ServiceAccountName: cr.Name,
-				},
+				Spec: newPodSpec(cr),
 			},
 		},
 	}
@@ -354,44 +310,68 @@ func newKnativeService(cr *v1.Workflow) *knsv1.Service {
 			ConfigurationSpec: knsv1.ConfigurationSpec{
 				Template: knsv1.RevisionTemplateSpec{
 					ObjectMeta: metav1.ObjectMeta{
-						Name:      cr.Name + "-v1",
-						Namespace: cr.Namespace,
-						Labels:    getDeploymentLabels(cr),
+						Labels: getDeploymentLabels(cr),
 					},
 					Spec: knsv1.RevisionSpec{
-						PodSpec: corev1.PodSpec{
-							Containers: []corev1.Container{
-								{
-									Name:            cr.Name,
-									Image:           getImage(cr),
-									ImagePullPolicy: corev1.PullAlways,
-									Ports: []corev1.ContainerPort{
-										{
-											Protocol:      "TCP",
-											ContainerPort: 8080,
-										},
-									},
-									Env: []corev1.EnvVar{
-										{
-											Name:  "WORKFLOW_NAME",
-											Value: cr.Name,
-										},
-										{
-											Name:  "WORKFLOW_SOURCE",
-											Value: "k8s",
-										},
-										{
-											Name:  "NAMESPACE",
-											Value: cr.Namespace,
-										},
-									},
-								},
-							},
-							ServiceAccountName: cr.Name,
-						},
+						PodSpec: newPodSpec(cr),
 					},
 				},
 			},
 		},
 	}
+}
+
+func newPodSpec(cr *v1.Workflow) corev1.PodSpec {
+	return corev1.PodSpec{
+		Containers: []corev1.Container{
+			{
+				Name:            cr.Name,
+				Image:           getImage(cr),
+				ImagePullPolicy: corev1.PullAlways,
+				Ports: []corev1.ContainerPort{
+					{
+						Protocol:      "TCP",
+						ContainerPort: 8080,
+					},
+				},
+				Env: []corev1.EnvVar{
+					{
+						Name:  "WORKFLOW_NAME",
+						Value: cr.Name,
+					},
+					{
+						Name:  "WORKFLOW_SOURCE",
+						Value: "k8s",
+					},
+					{
+						Name:  "NAMESPACE",
+						Value: cr.Namespace,
+					},
+				},
+			},
+		},
+		ServiceAccountName: cr.Name,
+	}
+}
+
+func (r *ReconcileWorkflow) getDeployment(cr *v1.Workflow, reqLogger logr.Logger) *appsv1.Deployment {
+	labelSelector, _ := metav1.LabelSelectorAsSelector(&metav1.LabelSelector{
+		MatchLabels: getLabels(cr),
+	})
+
+	listOptions := &client.ListOptions{
+		Namespace:     cr.Namespace,
+		LabelSelector: labelSelector,
+	}
+
+	dList := &appsv1.DeploymentList{}
+
+	if err := r.client.List(context.TODO(), listOptions, dList); err == nil {
+		for _, dIns := range dList.Items {
+			reqLogger.Info("Retrieved deployment", "Name", dIns.Name)
+			return &dIns
+		}
+	}
+
+	return nil
 }
