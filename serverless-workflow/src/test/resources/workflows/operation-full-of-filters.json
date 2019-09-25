@@ -11,22 +11,7 @@
         "result-path": "$.iso",
         "output-path": "$.country.iso"
       },
-      "actions": [
-        {
-          "filter": {
-            "input-path": "$.country",
-            "result-path": "$.iso",
-            "output-path": "$.country.iso"
-          },
-          "function": {
-            "name": "Function 1",
-            "metadata": {
-              "type": "Rest",
-              "url": "http://localhost/f1"
-            }
-          }
-        }
-      ],
+      "actions": [],
       "next-state": "End node"
     },
     {

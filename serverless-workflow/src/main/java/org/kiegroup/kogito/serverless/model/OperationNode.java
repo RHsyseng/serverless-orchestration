@@ -2,9 +2,8 @@ package org.kiegroup.kogito.serverless.model;
 
 import java.util.Map;
 
-import javax.ws.rs.core.MediaType;
-
 import org.jbpm.ruleflow.core.RuleFlowProcessFactory;
+import org.jbpm.ruleflow.core.factory.HumanTaskNodeFactory;
 import org.jbpm.ruleflow.core.factory.WorkItemNodeFactory;
 import org.kiegroup.kogito.workitem.handler.BaseWorkItemHandler;
 import org.kiegroup.kogito.workitem.handler.LogWorkItemHandler;
@@ -16,7 +15,7 @@ import org.serverless.workflow.api.states.OperationState;
 
 class OperationNode extends GraphNode {
 
-    private static final String WORKITEM_TYPE = "type";
+    private static final String HUMAN_TASK_HANDLER_NAME = "HumanTask";
 
     private final OperationState state;
 
@@ -53,27 +52,36 @@ class OperationNode extends GraphNode {
     private void buildWorkItemNode(RuleFlowProcessFactory factory, Function function) {
         Long prevId = this.getId();
         Long id = this.getNextId();
-        String type = null;
-        if (function.getMetadata() != null) {
-            type = function.getMetadata().get(WORKITEM_TYPE);
-        }
-        if (type == null) {
-            throw new IllegalArgumentException("Type is mandatory in the function metadata for function: " + function.getName());
-        }
-        WorkItemNodeFactory wi = factory.workItemNode(id)
-            .name(function.getName())
-            .inMapping(BaseWorkItemHandler.PARAM_CONTENT_DATA, JsonModel.DATA_PARAM)
-            .outMapping(BaseWorkItemHandler.PARAM_RESULT, JsonModel.DATA_PARAM)
-            .workName(function.getMetadata().get(BaseWorkItemHandler.PARAM_TYPE));
-        if (RestWorkItemHandler.HANDLER_NAME.equals(type)) {
-            buildRestWorkItem(wi, function);
-        } else if (LogWorkItemHandler.HANDLER_NAME.equals(type)) {
-            buildLogWorkItem(wi, function);
+        String type = function.getType();
+        if(HUMAN_TASK_HANDLER_NAME.equals(type)) {
+            buildHumanTaskNode(factory.humanTaskNode(id), function);
         } else {
-            throw new IllegalArgumentException("Unsupported function type: " + type);
+            WorkItemNodeFactory wi = factory.workItemNode(id)
+                .name(function.getName())
+                .inMapping(BaseWorkItemHandler.PARAM_CONTENT_DATA, WorkflowPayload.DATA_PARAM)
+                .outMapping(BaseWorkItemHandler.PARAM_RESULT, WorkflowPayload.DATA_PARAM)
+                .workName(function.getType());
+            if (RestWorkItemHandler.HANDLER_NAME.equals(type)) {
+                buildRestWorkItem(wi, function);
+            } else if (LogWorkItemHandler.HANDLER_NAME.equals(type)) {
+                buildLogWorkItem(wi, function);
+            } else {
+                throw new IllegalArgumentException("Unsupported function type: " + type);
+            }
+            wi.done();
         }
-        wi.done();
         connect(factory, prevId, id);
+    }
+
+    private void buildHumanTaskNode(HumanTaskNodeFactory factory, Function function) {
+        factory.name(function.getName())
+            .workParameter("Locale", "en-UK")
+            .workParameter("TaskName", function.getName())
+            .workParameter("Skippable", "true")
+            .workParameter("Priority", "1")
+            .inMapping(WorkflowPayload.DATA_PARAM, WorkflowPayload.DATA_PARAM)
+            .outMapping(WorkflowPayload.DATA_PARAM, WorkflowPayload.DATA_PARAM)
+            .done();
     }
 
     @Override
@@ -97,19 +105,19 @@ class OperationNode extends GraphNode {
 
     private void buildRestWorkItem(WorkItemNodeFactory wi, Function function) {
         wi.workParameter(RestWorkItemHandler.PARAM_TASK_NAME, RestWorkItemHandler.HANDLER_NAME);
-        addWorkParameterFromMetadata(wi, RestWorkItemHandler.PARAM_METHOD, function.getMetadata());
-        addWorkParameterFromMetadata(wi, RestWorkItemHandler.PARAM_URL, function.getMetadata());
+        addWorkParameter(wi, RestWorkItemHandler.PARAM_METHOD, function.getParameters());
+        addWorkParameter(wi, RestWorkItemHandler.PARAM_URL, function.getParameters());
         //TODO: Implement retry
         //TODO: Implement timeout
     }
 
     private void buildLogWorkItem(WorkItemNodeFactory wi, Function function) {
-        addWorkParameterFromMetadata(wi, LogWorkItemHandler.PARAM_LEVEL, function.getMetadata());
-        addWorkParameterFromMetadata(wi, LogWorkItemHandler.PARAM_MESSAGE, function.getMetadata());
-        addWorkParameterFromMetadata(wi, LogWorkItemHandler.PARAM_FIELD, function.getMetadata());
+        addWorkParameter(wi, LogWorkItemHandler.PARAM_LEVEL, function.getParameters());
+        addWorkParameter(wi, LogWorkItemHandler.PARAM_MESSAGE, function.getParameters());
+        addWorkParameter(wi, LogWorkItemHandler.PARAM_FIELD, function.getParameters());
     }
 
-    private void addWorkParameterFromMetadata(WorkItemNodeFactory wi, String param, Map<String, String> metadata) {
+    private void addWorkParameter(WorkItemNodeFactory wi, String param, Map<String, String> metadata) {
         if (metadata == null || !metadata.containsKey(param)) {
             return;
         }

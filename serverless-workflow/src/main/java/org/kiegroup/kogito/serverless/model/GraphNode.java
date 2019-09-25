@@ -90,17 +90,17 @@ public abstract class GraphNode {
     }
 
     void buildInputAction(ProcessContext kcontext, Filter filter) {
-        JsonObject data = (JsonObject) kcontext.getVariable(JsonModel.DATA_PARAM);
+        WorkflowData data = (WorkflowData) kcontext.getVariable(WorkflowPayload.DATA_PARAM);
         kcontext.setVariable(Graph.BACKUP_DATA_VAR, data);
-        Object result = jsonPath.filter(data, filter.getInputPath());
-        kcontext.setVariable(JsonModel.DATA_PARAM, result);
+        Object result = jsonPath.filter(data.object, filter.getInputPath());
+        kcontext.setVariable(WorkflowPayload.DATA_PARAM, result);
     }
 
     void buildOutputAction(ProcessContext kcontext, Filter filter) {
-        JsonObject data = (JsonObject) kcontext.getVariable(JsonModel.DATA_PARAM);
-        Object result = jsonPath.filter(data, filter.getResultPath());
+        WorkflowData data = (WorkflowData) kcontext.getVariable(WorkflowPayload.DATA_PARAM);
+        Object result = jsonPath.filter(data.object, filter.getResultPath());
         JsonObject backup = (JsonObject) kcontext.getVariable(Graph.BACKUP_DATA_VAR);
-        JsonObject newData = jsonPath.set(backup, filter.getOutputPath(), result);
-        kcontext.setVariable(JsonModel.DATA_PARAM, newData);
+        WorkflowData newData = new WorkflowData(jsonPath.set(backup, filter.getOutputPath(), result));
+        kcontext.setVariable(WorkflowPayload.DATA_PARAM, newData);
     }
 }

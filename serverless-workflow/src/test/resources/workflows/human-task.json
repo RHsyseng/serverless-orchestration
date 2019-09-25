@@ -6,26 +6,18 @@
       "type": "OPERATION",
       "name": "Operation node",
       "action-mode": "SEQUENTIAL",
-      "filter": {
-        "input-path": "$.country",
-        "result-path": "$.iso",
-        "output-path": "$.country.iso"
-      },
       "actions": [
         {
           "function": {
             "name": "Function 1",
-            "type": "Rest",
-            "parameters": {
-              "url": "http://localhost/f1"
-            }
+            "type": "HumanTask"
           }
         }
       ],
       "next-state": "End node"
     },
     {
-      "status": "FAILURE",
+      "status": "SUCCESS",
       "name": "End node",
       "type": "END"
     }

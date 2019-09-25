@@ -10,8 +10,8 @@
         {
           "function": {
             "name": "Set adult",
-            "metadata": {
-              "type": "Rest",
+            "type": "Rest",
+            "parameters": {
               "url": "http://localhost:8080/age"
             }
           }
@@ -40,8 +40,8 @@
         {
           "function": {
             "name": "Log user is adult",
-            "metadata": {
-              "type": "Log",
+            "type": "Log",
+            "parameters": {
               "field": "$.adult",
               "level": "INFO"
             }
@@ -58,8 +58,8 @@
         {
           "function": {
             "name": "User is NOT adult",
-            "metadata": {
-              "type": "Log",
+            "type": "Log",
+            "parameters": {
               "field": "$.name",
               "level": "ERROR"
             }
