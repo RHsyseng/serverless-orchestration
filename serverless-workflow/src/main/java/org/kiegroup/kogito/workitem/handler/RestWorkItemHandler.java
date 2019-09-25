@@ -29,20 +29,20 @@ public class RestWorkItemHandler implements BaseWorkItemHandler {
     public void executeWorkItem(WorkItem workItem, WorkItemManager manager) {
         logger.debug("Executing work item {}", workItem);
         Response response = null;
-        WorkflowPayload model = (WorkflowPayload) workItem.getParameter(PARAM_CONTENT_DATA);
-        JsonObject data = model.getData().object;
-        String method = getHttpMethod(workItem, data);
+        WorkflowData data = (WorkflowData) workItem.getParameter(PARAM_CONTENT_DATA);
+        JsonObject object = data.object;
+        String method = getHttpMethod(workItem, object);
         String target = (String) workItem.getParameter(PARAM_URL);
         JsonRestClient client = RestClientBuilder.newBuilder().baseUri(URI.create(target)).build(JsonRestClient.class);
         try {
             if (HttpMethod.GET.equals(method)) {
                 response = client.get();
             } else if (HttpMethod.POST.equals(method)) {
-                if (data == null) {
+                if (object == null) {
                     logger.warn("Trying to send a POST with an empty object");
-                    data = JsonObject.EMPTY_JSON_OBJECT;
+                    object = JsonObject.EMPTY_JSON_OBJECT;
                 }
-                response = client.post(data);
+                response = client.post(object);
             } else {
                 logger.info("Unsupported method: {}", method);
             }
@@ -51,8 +51,8 @@ public class RestWorkItemHandler implements BaseWorkItemHandler {
         }
         if (response != null && response.getStatus() >= Response.Status.OK.getStatusCode() &&
             response.getStatus() < Response.Status.BAD_REQUEST.getStatusCode()) {
-            model.setData(new WorkflowData(response.readEntity(JsonObject.class)));
-            manager.completeWorkItem(workItem.getId(), Collections.singletonMap(PARAM_RESULT, model));
+            WorkflowData resultData = new WorkflowData(response.readEntity(JsonObject.class));
+            manager.completeWorkItem(workItem.getId(), Collections.singletonMap(PARAM_RESULT, resultData));
         } else {
             manager.abortWorkItem(workItem.getId());
         }

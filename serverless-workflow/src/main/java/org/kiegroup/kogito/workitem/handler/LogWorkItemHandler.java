@@ -7,6 +7,7 @@ import javax.json.JsonObject;
 
 import org.kie.api.runtime.process.WorkItem;
 import org.kie.api.runtime.process.WorkItemManager;
+import org.kiegroup.kogito.serverless.model.WorkflowData;
 import org.kiegroup.kogito.serverless.model.WorkflowPayload;
 import org.kiegroup.kogito.workitem.handler.utils.JsonPath;
 import org.slf4j.Logger;
@@ -59,14 +60,14 @@ public class LogWorkItemHandler implements BaseWorkItemHandler {
     }
 
     private String parseMessage(WorkItem workItem) {
-        WorkflowPayload model = (WorkflowPayload) workItem.getParameter(PARAM_CONTENT_DATA);
-        JsonObject data = model.getData().object;
+        WorkflowData data = (WorkflowData) workItem.getParameter(PARAM_CONTENT_DATA);
+        JsonObject object = data.object;
         if (workItem.getParameter(PARAM_FIELD) != null) {
             String path = (String) workItem.getParameter(PARAM_FIELD);
-            if (data == null) {
+            if (object == null) {
                 logger.warn("data is null. Unable to log field: {}", path);
             }
-            return String.format("%s: %s", workItem.getParameter(PARAM_FIELD), jsonPath.filterAsString(data, path));
+            return String.format("%s: %s", workItem.getParameter(PARAM_FIELD), jsonPath.filterAsString(object, path));
         }
         return (String) workItem.getParameter(PARAM_MESSAGE);
     }
