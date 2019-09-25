@@ -1,5 +1,0 @@
-credentials:
-  - username: kermit
-    password: thefrog
-    roles:
-      - admin
