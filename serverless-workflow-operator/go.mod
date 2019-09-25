@@ -5,13 +5,16 @@ require (
 	github.com/RHsyseng/operator-utils v0.0.0-20190904181055-24b5b6380a3f
 	github.com/go-logr/logr v0.1.0
 	github.com/go-openapi/spec v0.19.0
-	github.com/openshift/api v3.9.0+incompatible
+	github.com/google/go-containerregistry v0.0.0-20190917210610-5340dbaba4cf // indirect
+	github.com/openshift/api v3.9.0+incompatible // indirect
 	github.com/operator-framework/operator-sdk v0.10.1-0.20190905003907-4ebf3aa52e61
 	github.com/spf13/pflag v1.0.3
 	k8s.io/api v0.0.0-20190612125737-db0771252981
 	k8s.io/apimachinery v0.0.0-20190612125636-6a5db36e93ad
 	k8s.io/client-go v11.0.0+incompatible
 	k8s.io/kube-openapi v0.0.0-20190603182131-db7b694dc208
+	knative.dev/pkg v0.0.0-20190918185647-2d6c3459cedf // indirect
+	knative.dev/serving v0.9.0
 	sigs.k8s.io/controller-runtime v0.1.12
 	sigs.k8s.io/controller-tools v0.1.10
 )
@@ -35,3 +38,5 @@ replace (
 )
 
 replace github.com/operator-framework/operator-sdk => github.com/operator-framework/operator-sdk v0.10.0
+
+replace github.com/google/go-cmp => github.com/google/go-cmp v0.3.1

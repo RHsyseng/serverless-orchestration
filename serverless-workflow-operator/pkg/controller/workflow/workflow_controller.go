@@ -2,6 +2,7 @@ package workflow
 
 import (
 	"context"
+	knsv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	"github.com/RHsyseng/operator-utils/pkg/olm"
 	v1 "github.com/RHsyseng/serverless-orchestration/serverless-workflow-operator/pkg/apis/app/v1alpha1"
@@ -113,35 +114,46 @@ func (r *ReconcileWorkflow) Reconcile(request reconcile.Request) (reconcile.Resu
 	// Define a ServiceAccount
 	sa := newServiceAccount(instance)
 	saObjectForCR := &objectForCR{sa, sa, &sa.ObjectMeta, "ServiceAccount"}
-	if err = r.createObjectForCR(instance, saObjectForCR, &corev1.ServiceAccount{}, reqLogger); err != nil {
+	if err = r.createObject(instance, saObjectForCR, &corev1.ServiceAccount{}, reqLogger); err != nil {
 		return reconcile.Result{}, err
 	}
 
 	// Define a RoleBinding
 	rb := newRoleBinding(instance)
 	rbObjectForCR := &objectForCR{rb, rb, &rb.ObjectMeta, "RoleBinding"}
-	if err = r.createObjectForCR(instance, rbObjectForCR, &authv1.RoleBinding{}, reqLogger); err != nil {
+	if err = r.createObject(instance, rbObjectForCR, &authv1.RoleBinding{}, reqLogger); err != nil {
 		return reconcile.Result{}, err
 	}
 
-	// Define a Deployment
-	d := newDeploymentForCR(instance)
-	dcObjectForCR := &objectForCR{runtimeObject: d, metaObject: d, objectMeta: &d.ObjectMeta, objectType: "Deployment"}
-	if err = r.createObjectForCR(instance, dcObjectForCR, &appsv1.Deployment{}, reqLogger); err != nil {
-		return reconcile.Result{}, err
-	}
+	if instance.Spec.Knative {
+		service := newKnativeService(instance)
+		serviceObjectForCR := &objectForCR{runtimeObject: service, metaObject: service, objectMeta: &service.ObjectMeta, objectType: "Knative.Service"}
+		if err = r.createObject(instance, serviceObjectForCR, &knsv1.Service{}, reqLogger); err != nil {
+			return reconcile.Result{}, err
+		}
+	} else {
+		// Define a Deployment
+		d := newDeployment(instance)
+		dcObjectForCR := &objectForCR{runtimeObject: d, metaObject: d, objectMeta: &d.ObjectMeta, objectType: "Deployment"}
+		if err = r.createObject(instance, dcObjectForCR, &appsv1.Deployment{}, reqLogger); err != nil {
+			return reconcile.Result{}, err
+		}
 
-	// Define a Service
-	service := newServiceForCR(instance)
-	svcObjectForCR := &objectForCR{runtimeObject: service, metaObject: service, objectMeta: &service.ObjectMeta, objectType: "Service"}
-	if err = r.createObjectForCR(instance, svcObjectForCR, &corev1.Service{}, reqLogger); err != nil {
-		return reconcile.Result{}, err
+		// Define a Service
+		service := newService(instance)
+		svcObjectForCR := &objectForCR{runtimeObject: service, metaObject: service, objectMeta: &service.ObjectMeta, objectType: "Service"}
+		if err = r.createObject(instance, svcObjectForCR, &corev1.Service{}, reqLogger); err != nil {
+			return reconcile.Result{}, err
+		}
 	}
 
 	// Update DC status
-	dcInstance := &appsv1.Deployment{}
-	if err = r.client.Get(context.TODO(), types.NamespacedName{Name: d.Name, Namespace: d.Namespace}, dcInstance); err == nil {
-		instance.Status.Deployments = olm.GetDeploymentStatus([]appsv1.Deployment{*dcInstance})
+	if dInstance := r.getDeployment(instance, reqLogger); dInstance != nil {
+		instance.Status.Deployments = olm.GetDeploymentStatus([]appsv1.Deployment{*dInstance})
+		reqLogger.Info("Update CR for deployment status")
+		if err = r.client.Update(context.TODO(), instance); err != nil {
+			return reconcile.Result{}, err
+		}
 	}
 
 	return reconcile.Result{}, nil
@@ -154,7 +166,7 @@ type objectForCR struct {
 	objectType    string
 }
 
-func (r *ReconcileWorkflow) createObjectForCR(cr *v1.Workflow,
+func (r *ReconcileWorkflow) createObject(cr *v1.Workflow,
 	obj *objectForCR, foundObj runtime.Object, reqLogger logr.Logger) error {
 
 	// Set Workflow instance as the owner and controller
@@ -177,7 +189,7 @@ func (r *ReconcileWorkflow) createObjectForCR(cr *v1.Workflow,
 }
 
 const (
-	_defaultImage = "quay.io/ruben/workflow-service:latest"
+	_defaultImage = "quay.io/rhsyseng/workflow-service:latest"
 	_roleName     = "workflow-reader"
 )
 
@@ -211,7 +223,7 @@ func newRoleBinding(cr *v1.Workflow) *authv1.RoleBinding {
 }
 
 // Create deployment for the app
-func newDeploymentForCR(cr *v1.Workflow) *appsv1.Deployment {
+func newDeployment(cr *v1.Workflow) *appsv1.Deployment {
 	return &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      cr.Name,
@@ -232,48 +244,14 @@ func newDeploymentForCR(cr *v1.Workflow) *appsv1.Deployment {
 					Namespace: cr.Namespace,
 					Labels:    getDeploymentLabels(cr),
 				},
-				Spec: corev1.PodSpec{
-					Containers: []corev1.Container{
-						{
-							Name:            cr.Name,
-							Image:           getImage(cr),
-							ImagePullPolicy: corev1.PullAlways,
-							Ports: []corev1.ContainerPort{
-								{
-									Name:          "http",
-									Protocol:      "TCP",
-									ContainerPort: 8080,
-								},
-							},
-							Env: []corev1.EnvVar{
-								{
-									Name:  "WORKFLOW_NAME",
-									Value: cr.Name,
-								},
-								{
-									Name:  "WORKFLOW_SOURCE",
-									Value: "k8s",
-								},
-								{
-									Name: "NAMESPACE",
-									ValueFrom: &corev1.EnvVarSource{
-										FieldRef: &corev1.ObjectFieldSelector{
-											FieldPath: "metadata.namespace",
-										},
-									},
-								},
-							},
-						},
-					},
-					ServiceAccountName: cr.Name,
-				},
+				Spec: newPodSpec(cr),
 			},
 		},
 	}
 }
 
 // Create service for the app
-func newServiceForCR(cr *v1.Workflow) *corev1.Service {
+func newService(cr *v1.Workflow) *corev1.Service {
 	ports := []corev1.ServicePort{
 		{
 			Name:       "http",
@@ -319,4 +297,81 @@ func getImage(cr *v1.Workflow) string {
 
 func intPtr(x int32) *int32 {
 	return &x
+}
+
+func newKnativeService(cr *v1.Workflow) *knsv1.Service {
+	return &knsv1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      cr.Name,
+			Namespace: cr.Namespace,
+			Labels:    getLabels(cr),
+		},
+		Spec: knsv1.ServiceSpec{
+			ConfigurationSpec: knsv1.ConfigurationSpec{
+				Template: knsv1.RevisionTemplateSpec{
+					ObjectMeta: metav1.ObjectMeta{
+						Labels: getDeploymentLabels(cr),
+					},
+					Spec: knsv1.RevisionSpec{
+						PodSpec: newPodSpec(cr),
+					},
+				},
+			},
+		},
+	}
+}
+
+func newPodSpec(cr *v1.Workflow) corev1.PodSpec {
+	return corev1.PodSpec{
+		Containers: []corev1.Container{
+			{
+				Name:            cr.Name,
+				Image:           getImage(cr),
+				ImagePullPolicy: corev1.PullAlways,
+				Ports: []corev1.ContainerPort{
+					{
+						Protocol:      "TCP",
+						ContainerPort: 8080,
+					},
+				},
+				Env: []corev1.EnvVar{
+					{
+						Name:  "WORKFLOW_NAME",
+						Value: cr.Name,
+					},
+					{
+						Name:  "WORKFLOW_SOURCE",
+						Value: "k8s",
+					},
+					{
+						Name:  "NAMESPACE",
+						Value: cr.Namespace,
+					},
+				},
+			},
+		},
+		ServiceAccountName: cr.Name,
+	}
+}
+
+func (r *ReconcileWorkflow) getDeployment(cr *v1.Workflow, reqLogger logr.Logger) *appsv1.Deployment {
+	labelSelector, _ := metav1.LabelSelectorAsSelector(&metav1.LabelSelector{
+		MatchLabels: getLabels(cr),
+	})
+
+	listOptions := &client.ListOptions{
+		Namespace:     cr.Namespace,
+		LabelSelector: labelSelector,
+	}
+
+	dList := &appsv1.DeploymentList{}
+
+	if err := r.client.List(context.TODO(), listOptions, dList); err == nil {
+		for _, dIns := range dList.Items {
+			reqLogger.Info("Retrieved deployment", "Name", dIns.Name)
+			return &dIns
+		}
+	}
+
+	return nil
 }

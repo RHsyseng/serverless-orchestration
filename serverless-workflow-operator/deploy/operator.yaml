@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: serverless-workflow-operator
+  name: workflow-operator
 spec:
   replicas: 1
   selector:
     matchLabels:
-      name: serverless-workflow-operator
+      name: workflow-operator
   template:
     metadata:
       labels:
-        name: serverless-workflow-operator
+        name: workflow-operator
     spec:
-      serviceAccountName: serverless-workflow-operator
+      serviceAccountName: workflow-operator
       containers:
-        - name: serverless-workflow-operator
-          image: quay.io/ruben/serverless-workflow-operator:latest
+        - name: workflow-operator
+          image: quay.io/rhsyseng/workflow-operator:latest
           command:
           - serverless-workflow-operator
           imagePullPolicy: Always
@@ -29,4 +29,4 @@ spec:
                 fieldRef:
                   fieldPath: metadata.name
             - name: OPERATOR_NAME
-              value: "serverless-workflow-operator"
+              value: "workflow-operator"

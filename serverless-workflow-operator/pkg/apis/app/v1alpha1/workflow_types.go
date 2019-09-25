@@ -14,6 +14,7 @@ type WorkflowSpec struct {
 	Definition Definition `json:"definition"`
 	Image      string     `json:"image,omitempty"`
 	Watch      bool       `json:"watch,omitempty"`
+	Knative    bool       `json:"knative,omitempty"`
 }
 
 type Definition struct {
