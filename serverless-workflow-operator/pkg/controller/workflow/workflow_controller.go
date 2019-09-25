@@ -4,7 +4,6 @@ import (
 	"context"
 
 	knsv1 "knative.dev/serving/pkg/apis/serving/v1"
-	knsv1alpha1 "knative.dev/serving/pkg/apis/serving/v1alpha1"
 
 	"github.com/RHsyseng/operator-utils/pkg/olm"
 	v1 "github.com/RHsyseng/serverless-orchestration/serverless-workflow-operator/pkg/apis/app/v1alpha1"
@@ -130,7 +129,7 @@ func (r *ReconcileWorkflow) Reconcile(request reconcile.Request) (reconcile.Resu
 	if instance.Spec.Knative {
 		service := newKnativeService(instance)
 		serviceObjectForCR := &objectForCR{runtimeObject: service, metaObject: service, objectMeta: &service.ObjectMeta, objectType: "Knative.Service"}
-		if err = r.createObject(instance, serviceObjectForCR, &knsv1alpha1.Service{}, reqLogger); err != nil {
+		if err = r.createObject(instance, serviceObjectForCR, &knsv1.Service{}, reqLogger); err != nil {
 			return reconcile.Result{}, err
 		}
 
@@ -344,53 +343,51 @@ func intPtr(x int32) *int32 {
 	return &x
 }
 
-func newKnativeService(cr *v1.Workflow) *knsv1alpha1.Service {
-	return &knsv1alpha1.Service{
+func newKnativeService(cr *v1.Workflow) *knsv1.Service {
+	return &knsv1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      cr.Name,
 			Namespace: cr.Namespace,
 			Labels:    getLabels(cr),
 		},
-		Spec: knsv1alpha1.ServiceSpec{
-			ConfigurationSpec: knsv1alpha1.ConfigurationSpec{
-				Template: &knsv1alpha1.RevisionTemplateSpec{
+		Spec: knsv1.ServiceSpec{
+			ConfigurationSpec: knsv1.ConfigurationSpec{
+				Template: knsv1.RevisionTemplateSpec{
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      cr.Name + "-v1",
 						Namespace: cr.Namespace,
 						Labels:    getDeploymentLabels(cr),
 					},
-					Spec: knsv1alpha1.RevisionSpec{
-						RevisionSpec: knsv1.RevisionSpec{
-							PodSpec: corev1.PodSpec{
-								Containers: []corev1.Container{
-									{
-										Name:            cr.Name,
-										Image:           getImage(cr),
-										ImagePullPolicy: corev1.PullAlways,
-										Ports: []corev1.ContainerPort{
-											{
-												Protocol:      "TCP",
-												ContainerPort: 8080,
-											},
+					Spec: knsv1.RevisionSpec{
+						PodSpec: corev1.PodSpec{
+							Containers: []corev1.Container{
+								{
+									Name:            cr.Name,
+									Image:           getImage(cr),
+									ImagePullPolicy: corev1.PullAlways,
+									Ports: []corev1.ContainerPort{
+										{
+											Protocol:      "TCP",
+											ContainerPort: 8080,
 										},
-										Env: []corev1.EnvVar{
-											{
-												Name:  "WORKFLOW_NAME",
-												Value: cr.Name,
-											},
-											{
-												Name:  "WORKFLOW_SOURCE",
-												Value: "k8s",
-											},
-											{
-												Name:  "NAMESPACE",
-												Value: cr.Namespace,
-											},
+									},
+									Env: []corev1.EnvVar{
+										{
+											Name:  "WORKFLOW_NAME",
+											Value: cr.Name,
+										},
+										{
+											Name:  "WORKFLOW_SOURCE",
+											Value: "k8s",
+										},
+										{
+											Name:  "NAMESPACE",
+											Value: cr.Namespace,
 										},
 									},
 								},
-								ServiceAccountName: cr.Name,
 							},
+							ServiceAccountName: cr.Name,
 						},
 					},
 				},
