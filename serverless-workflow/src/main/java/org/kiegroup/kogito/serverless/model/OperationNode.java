@@ -58,8 +58,8 @@ class OperationNode extends GraphNode {
         } else {
             WorkItemNodeFactory wi = factory.workItemNode(id)
                 .name(function.getName())
-                .inMapping(BaseWorkItemHandler.PARAM_CONTENT_DATA, JsonModel.DATA_PARAM)
-                .outMapping(BaseWorkItemHandler.PARAM_RESULT, JsonModel.DATA_PARAM)
+                .inMapping(BaseWorkItemHandler.PARAM_CONTENT_DATA, WorkflowPayload.DATA_PARAM)
+                .outMapping(BaseWorkItemHandler.PARAM_RESULT, WorkflowPayload.DATA_PARAM)
                 .workName(function.getType());
             if (RestWorkItemHandler.HANDLER_NAME.equals(type)) {
                 buildRestWorkItem(wi, function);
@@ -79,8 +79,8 @@ class OperationNode extends GraphNode {
             .workParameter("TaskName", function.getName())
             .workParameter("Skippable", "true")
             .workParameter("Priority", "1")
-            .inMapping(JsonModel.DATA_PARAM, JsonModel.DATA_PARAM)
-            .outMapping(JsonModel.DATA_PARAM, JsonModel.DATA_PARAM)
+            .inMapping(WorkflowPayload.DATA_PARAM, WorkflowPayload.DATA_PARAM)
+            .outMapping(WorkflowPayload.DATA_PARAM, WorkflowPayload.DATA_PARAM)
             .done();
     }
 

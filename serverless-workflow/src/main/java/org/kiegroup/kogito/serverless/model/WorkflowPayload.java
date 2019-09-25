@@ -7,16 +7,17 @@ import javax.json.JsonObject;
 
 import org.kie.kogito.Model;
 
-public class JsonModel implements Model {
+public class WorkflowPayload implements Model {
 
+    public static final String ID_PARAM = "id";
     public static final String DATA_PARAM = "data";
     public static final String STATUS_PARAM = "status";
 
     private String id;
-    private JsonObject data;
+    private WorkflowData data;
     private String status;
 
-    public JsonModel setId(String id) {
+    public WorkflowPayload setId(String id) {
         this.id = id;
         return this;
     }
@@ -25,16 +26,16 @@ public class JsonModel implements Model {
         return id;
     }
 
-    public JsonModel setData(JsonObject data) {
+    public WorkflowPayload setData(WorkflowData data) {
         this.data = data;
         return this;
     }
 
-    public JsonObject getData() {
+    public WorkflowData getData() {
         return data;
     }
 
-    public JsonModel setStatus(String status) {
+    public WorkflowPayload setStatus(String status) {
         this.status = status;
         return this;
     }
@@ -54,30 +55,38 @@ public class JsonModel implements Model {
     @Override
     public void fromMap(Map<String, Object> params) {
         this.id = null;
-        this.data = (JsonObject) params.get(DATA_PARAM);
+        this.data = (WorkflowData) params.get(DATA_PARAM);
         this.status = (String) params.get(STATUS_PARAM);
     }
 
     public void fromMap(String id, Map<String, Object> params) {
         this.id = id;
-        this.data = (JsonObject) params.get(DATA_PARAM);
+        this.data = (WorkflowData) params.get(DATA_PARAM);
         this.status = (String) params.get(STATUS_PARAM);
     }
 
-    public static JsonModel newInstance(JsonObject data) {
-        JsonModel jsonModel = new JsonModel();
+    public static WorkflowPayload newInstance(WorkflowData data) {
+        WorkflowPayload jsonModel = new WorkflowPayload();
         if (data == null) {
-            data = JsonObject.EMPTY_JSON_OBJECT;
+            data = new WorkflowData();
         }
         jsonModel.data = data;
         return jsonModel;
     }
 
-    public static JsonModel newInstance(JsonModel model) {
+    public static WorkflowPayload newInstance(JsonObject object) {
+        WorkflowPayload jsonModel = new WorkflowPayload();
+        if (object == null) {
+            jsonModel.data = new WorkflowData();
+        }
+        jsonModel.data = new WorkflowData(object);
+        return jsonModel;
+    }
+    public static WorkflowPayload newInstance(WorkflowPayload model) {
         if(model == null) {
             return null;
         }
-        return JsonModel.newInstance(model.data)
+        return WorkflowPayload.newInstance(model.data)
             .setId(model.id)
             .setStatus(model.status);
     }

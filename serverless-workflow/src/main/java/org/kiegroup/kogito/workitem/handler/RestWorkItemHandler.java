@@ -3,7 +3,6 @@ package org.kiegroup.kogito.workitem.handler;
 import java.net.URI;
 import java.util.Collections;
 
-import javax.json.Json;
 import javax.json.JsonObject;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response;
@@ -11,6 +10,8 @@ import javax.ws.rs.core.Response;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.kie.api.runtime.process.WorkItem;
 import org.kie.api.runtime.process.WorkItemManager;
+import org.kiegroup.kogito.serverless.model.WorkflowData;
+import org.kiegroup.kogito.serverless.model.WorkflowPayload;
 import org.kiegroup.kogito.workitem.handler.rest.JsonRestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +29,8 @@ public class RestWorkItemHandler implements BaseWorkItemHandler {
     public void executeWorkItem(WorkItem workItem, WorkItemManager manager) {
         logger.debug("Executing work item {}", workItem);
         Response response = null;
-        JsonObject data = (JsonObject) workItem.getParameter(PARAM_CONTENT_DATA);
+        WorkflowPayload model = (WorkflowPayload) workItem.getParameter(PARAM_CONTENT_DATA);
+        JsonObject data = model.getData().object;
         String method = getHttpMethod(workItem, data);
         String target = (String) workItem.getParameter(PARAM_URL);
         JsonRestClient client = RestClientBuilder.newBuilder().baseUri(URI.create(target)).build(JsonRestClient.class);
@@ -38,7 +40,7 @@ public class RestWorkItemHandler implements BaseWorkItemHandler {
             } else if (HttpMethod.POST.equals(method)) {
                 if (data == null) {
                     logger.warn("Trying to send a POST with an empty object");
-                    data = Json.createObjectBuilder().build();
+                    data = JsonObject.EMPTY_JSON_OBJECT;
                 }
                 response = client.post(data);
             } else {
@@ -49,8 +51,8 @@ public class RestWorkItemHandler implements BaseWorkItemHandler {
         }
         if (response != null && response.getStatus() >= Response.Status.OK.getStatusCode() &&
             response.getStatus() < Response.Status.BAD_REQUEST.getStatusCode()) {
-            manager.completeWorkItem(workItem.getId(),
-                                     Collections.singletonMap(PARAM_RESULT, response.readEntity(JsonObject.class)));
+            model.setData(new WorkflowData(response.readEntity(JsonObject.class)));
+            manager.completeWorkItem(workItem.getId(), Collections.singletonMap(PARAM_RESULT, model));
         } else {
             manager.abortWorkItem(workItem.getId());
         }

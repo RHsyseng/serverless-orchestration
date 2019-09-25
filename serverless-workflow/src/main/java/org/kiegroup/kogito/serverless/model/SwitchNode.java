@@ -98,7 +98,7 @@ class SwitchNode extends GraphNode {
     }
 
     private Boolean buildConstraint(ProcessContext kcontext, DefaultChoice choice) {
-        JsonObject data = (JsonObject) kcontext.getVariable(JsonModel.DATA_PARAM);
+        JsonObject data = (JsonObject) kcontext.getVariable(WorkflowPayload.DATA_PARAM);
         return jsonPath.eval(data, choice.getPath(), choice.getValue(), choice.getOperator());
     }
 

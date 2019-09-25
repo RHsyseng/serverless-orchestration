@@ -30,7 +30,7 @@ class EndNode extends GraphNode {
         }
         end.terminate(false)
             .action(kcontext -> {
-                kcontext.setVariable(JsonModel.STATUS_PARAM, state.getStatus().name());
+                kcontext.setVariable(WorkflowPayload.STATUS_PARAM, state.getStatus().name());
             })
             .done();
         connect(factory, prevId, id);
