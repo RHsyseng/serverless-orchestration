@@ -9,3 +9,4 @@ subjects:
 roleRef:
   kind: Role
   name: workflow-reader
+  apiGroup: rbac.authorization.k8s.io

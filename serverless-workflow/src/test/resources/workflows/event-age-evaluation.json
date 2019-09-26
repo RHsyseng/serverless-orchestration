@@ -1,0 +1,99 @@
+{
+  "name": "example-workflow",
+  "trigger-defs": [
+    {
+      "name": "http.trigger",
+      "source": "/example/http/source",
+      "type": "com.example.serverless.http.create"
+    },
+    {
+      "name": "kafka.trigger",
+      "source": "/example/kafka/source",
+      "type": "com.example.serverless.kafka.submit"
+    }
+  ],
+  "states": [
+    {
+      "start": true,
+      "name": "Calculate user is an adult",
+      "type": "EVENT",
+      "events": [
+        {
+          "event-expression": "name == 'http.trigger' or name == 'kafka.trigger'",
+          "action-mode": "SEQUENTIAL",
+          "actions": [
+            {
+              "function": {
+                "name": "Set adult",
+                "type": "Rest",
+                "parameters": {
+                  "url": "http://localhost:8080/age"
+                }
+              }
+            }
+          ],
+          "next-state": "Only adults allowed"
+        }
+      ]
+    },
+    {
+      "name": "Only adults allowed",
+      "type": "SWITCH",
+      "choices": [
+        {
+          "path": "$.adult",
+          "value": true,
+          "operator": "EQ",
+          "next-state": "Log allowed"
+        }
+      ],
+      "default": "Log not allowed"
+    },
+    {
+      "type": "OPERATION",
+      "name": "Log allowed",
+      "action-mode": "SEQUENTIAL",
+      "actions": [
+        {
+          "function": {
+            "name": "Log user is adult",
+            "type": "Log",
+            "parameters": {
+              "field": "$.adult",
+              "level": "INFO"
+            }
+          }
+        }
+      ],
+      "next-state": "Allow access"
+    },
+    {
+      "type": "OPERATION",
+      "name": "Log not allowed",
+      "action-mode": "SEQUENTIAL",
+      "actions": [
+        {
+          "function": {
+            "name": "User is NOT adult",
+            "type": "Log",
+            "parameters": {
+              "field": "$.name",
+              "level": "ERROR"
+            }
+          }
+        }
+      ],
+      "next-state": "Access not allowed"
+    },
+    {
+      "status": "SUCCESS",
+      "name": "Allow access",
+      "type": "END"
+    },
+    {
+      "status": "FAILURE",
+      "name": "Access not allowed",
+      "type": "END"
+    }
+  ]
+}

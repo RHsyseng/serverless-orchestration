@@ -1,6 +1,5 @@
 package org.kiegroup.kogito.workitem.handler.rest;
 
-import javax.json.JsonObject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -22,5 +21,5 @@ public interface JsonRestClient {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    Response post(JsonObject data);
+    Response post(String data);
 }

@@ -29,9 +29,7 @@ class EndNode extends GraphNode {
             buildInputFilter(end);
         }
         end.terminate(false)
-            .action(kcontext -> {
-                kcontext.setVariable(WorkflowPayload.STATUS_PARAM, state.getStatus().name());
-            })
+            .action(kcontext -> kcontext.setVariable(WorkflowPayload.STATUS_PARAM, state.getStatus().name()))
             .done();
         connect(factory, prevId, id);
     }

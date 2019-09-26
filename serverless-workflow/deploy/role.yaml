@@ -6,7 +6,7 @@ rules:
 - apiGroups:
     - app.kiegroup.org
   resources:
-    - serverlessorchestrationapps
+    - workflows
   verbs:
     - get
     - watch

@@ -2,8 +2,6 @@ package org.kiegroup.kogito.serverless.model;
 
 import java.util.List;
 
-import javax.json.JsonObject;
-
 import org.jbpm.ruleflow.core.RuleFlowProcessFactory;
 import org.jbpm.ruleflow.core.factory.SplitFactory;
 import org.jbpm.workflow.core.node.Join;
@@ -98,8 +96,8 @@ class SwitchNode extends GraphNode {
     }
 
     private Boolean buildConstraint(ProcessContext kcontext, DefaultChoice choice) {
-        WorkflowData data = (WorkflowData) kcontext.getVariable(WorkflowPayload.DATA_PARAM);
-        return jsonPath.eval(data.object, choice.getPath(), choice.getValue(), choice.getOperator());
+        String data = (String) kcontext.getVariable(WorkflowPayload.DATA_PARAM);
+        return jsonPath.eval(data, choice.getPath(), choice.getValue(), choice.getOperator());
     }
 
     @Override

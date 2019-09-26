@@ -24,7 +24,7 @@ public class Graph {
     private static final String VISIBILITY = "Public";
     private static final String VERSION = "1.0";
 
-    private static final ObjectDataType WORKFLOW_DATA_TYPE = new ObjectDataType(WorkflowData.class.getName());
+    private static final StringDataType WORKFLOW_DATA_TYPE = new StringDataType();
     private static final StringDataType STRING_DATA_TYPE = new StringDataType();
 
     private final Map<String, GraphNode> nodes = new HashMap<>();

@@ -178,7 +178,23 @@
     "allDeclaredFields": true
   },
   {
-    "name": "org.kiegroup.kogito.serverless.k8s.model.WorkflowSpecDeserializer",
+    "name": "org.glassfish.json.JsonProviderImpl",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "io.cloudevents.impl.DefaultCloudEventImpl",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "io.cloudevents.json.ZonedDateTimeDeserializer",
     "allDeclaredConstructors": true,
     "allPublicConstructors": true,
     "allDeclaredMethods": true,

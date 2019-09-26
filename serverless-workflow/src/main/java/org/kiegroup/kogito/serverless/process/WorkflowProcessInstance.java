@@ -20,6 +20,6 @@ public class WorkflowProcessInstance extends AbstractProcessInstance<WorkflowPay
 
     @Override
     protected void unbind(WorkflowPayload variables, Map<String, Object> vmap) {
-        variables.fromMap(this.id(), vmap);
+        variables.fromMap(vmap);
     }
 }

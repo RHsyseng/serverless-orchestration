@@ -9,6 +9,6 @@ spec:
     deployment: workflow-service
     app: workflow-service
   ports:
-    - name: http
-      port: 8080
+    - protocol: TCP
+      port: 80
       targetPort: 8080
