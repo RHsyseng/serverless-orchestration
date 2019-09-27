@@ -1,0 +1,13 @@
+apiVersion: eventing.knative.dev/v1alpha1
+kind: Trigger
+metadata:
+  name: workflow-trigger
+spec:
+  filter:
+    attributes:
+      type: 
+  subscriber:
+    ref:
+     apiVersion: v1
+     kind: Service
+     name: workflow-service

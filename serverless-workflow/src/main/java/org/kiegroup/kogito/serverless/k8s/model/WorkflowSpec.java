@@ -2,6 +2,7 @@ package org.kiegroup.kogito.serverless.k8s.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.fabric8.kubernetes.api.model.KubernetesResource;
+import org.kiegroup.kogito.serverless.serialization.WorkflowSpecDeserializer;
 
 @JsonDeserialize(
     using = WorkflowSpecDeserializer.class

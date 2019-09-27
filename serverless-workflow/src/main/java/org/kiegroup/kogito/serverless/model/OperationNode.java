@@ -53,7 +53,7 @@ class OperationNode extends GraphNode {
         Long prevId = this.getId();
         Long id = this.getNextId();
         String type = function.getType();
-        if(HUMAN_TASK_HANDLER_NAME.equals(type)) {
+        if (HUMAN_TASK_HANDLER_NAME.equals(type)) {
             buildHumanTaskNode(factory.humanTaskNode(id), function);
         } else {
             WorkItemNodeFactory wi = factory.workItemNode(id)

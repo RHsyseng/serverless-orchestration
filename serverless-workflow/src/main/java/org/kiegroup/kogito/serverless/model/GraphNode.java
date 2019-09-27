@@ -1,7 +1,5 @@
 package org.kiegroup.kogito.serverless.model;
 
-import javax.json.JsonObject;
-
 import org.jbpm.process.instance.impl.Action;
 import org.jbpm.ruleflow.core.RuleFlowProcessFactory;
 import org.kie.api.runtime.process.ProcessContext;
@@ -25,7 +23,6 @@ public abstract class GraphNode {
         return headerId;
     }
 
-
     void build(RuleFlowProcessFactory factory) {
         buildStart(factory);
         buildInput(factory);
@@ -34,13 +31,13 @@ public abstract class GraphNode {
     }
 
     void connectNextState(RuleFlowProcessFactory factory) {
-        if(getNextState() != null) {
+        if (getNextState() != null) {
             connect(factory, this.id, this.graph.getNodeId(getNextState()));
         }
     }
 
     void connect(RuleFlowProcessFactory factory, Long from, Long to) {
-        if(from != null && to != null) {
+        if (from != null && to != null) {
             factory.connection(from, to, "Flow_" + from + "_" + to);
         }
     }
@@ -54,7 +51,7 @@ public abstract class GraphNode {
     }
 
     Long getNextId() {
-        if(this.id == null) {
+        if (this.id == null) {
             this.id = this.headerId;
         } else {
             this.id = this.graph.getNextId();
@@ -73,7 +70,7 @@ public abstract class GraphNode {
     }
 
     private void buildStart(RuleFlowProcessFactory factory) {
-        if(getState().isStart()) {
+        if (getState().isStart()) {
             Long id = this.getNextId();
             factory.startNode(id)
                 .done();
@@ -90,17 +87,17 @@ public abstract class GraphNode {
     }
 
     void buildInputAction(ProcessContext kcontext, Filter filter) {
-        WorkflowData data = (WorkflowData) kcontext.getVariable(WorkflowPayload.DATA_PARAM);
+        String data = (String) kcontext.getVariable(WorkflowPayload.DATA_PARAM);
         kcontext.setVariable(Graph.BACKUP_DATA_VAR, data);
-        Object result = jsonPath.filter(data.object, filter.getInputPath());
+        Object result = jsonPath.filter(data, filter.getInputPath());
         kcontext.setVariable(WorkflowPayload.DATA_PARAM, result);
     }
 
     void buildOutputAction(ProcessContext kcontext, Filter filter) {
-        WorkflowData data = (WorkflowData) kcontext.getVariable(WorkflowPayload.DATA_PARAM);
-        Object result = jsonPath.filter(data.object, filter.getResultPath());
-        JsonObject backup = (JsonObject) kcontext.getVariable(Graph.BACKUP_DATA_VAR);
-        WorkflowData newData = new WorkflowData(jsonPath.set(backup, filter.getOutputPath(), result));
+        String data = (String) kcontext.getVariable(WorkflowPayload.DATA_PARAM);
+        Object result = jsonPath.filter(data, filter.getResultPath());
+        String backup = (String) kcontext.getVariable(Graph.BACKUP_DATA_VAR);
+        String newData = jsonPath.set(backup, filter.getOutputPath(), result);
         kcontext.setVariable(WorkflowPayload.DATA_PARAM, newData);
     }
 }
