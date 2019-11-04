@@ -1,0 +1,121 @@
+{
+  "name": "call-center",
+  "trigger-defs": [
+    {
+      "name": "create",
+      "source": "/callcenter",
+      "type": "org.kogito.examples.callcenter.create"
+    },
+    {
+      "name": "resolved",
+      "source": "/callcenter",
+      "type": "org.kogito.examples.callcenter.resolve",
+      "correlation-token": "$.id"
+    },
+    {
+      "name": "escalated",
+      "source": "/callcenter",
+      "type": "org.kogito.examples.callcenter.escalate",
+      "correlation-token": "$.id"
+    },
+    {
+      "name": "escalation-resolved",
+      "source": "/callcenter",
+      "type": "org.kogito.examples.callcenter.resolve-escalation",
+      "correlation-token": "$.id"
+    }
+  ],
+  "starts-at": "created",
+  "states": [
+    {
+      "name": "created",
+      "type": "EVENT",
+      "events": [
+        {
+          "event-expression": {
+            "path": "$.name",
+            "value": "create",
+            "operator": "Equals"
+          },
+          "next-state": "open"
+        }
+      ]
+    },
+    {
+      "name": "open",
+      "type": "OPERATION",
+      "action-mode": "SEQUENTIAL",
+      "actions": [
+      ],
+      "next-state": "assigned"
+    },
+    {
+      "name": "assigned",
+      "type": "EVENT",
+      "events": [
+        {
+          "event-expression": {
+            "path": "$.name",
+            "value": "resolve",
+            "operator": "Equals"
+          },
+          "next-state": "closed",
+          "timeout": {
+            "period": "P1D",
+            "then": "escalated"
+          }
+        },
+        {
+          "event-expression": {
+            "path": "$.name",
+            "value": "escalate",
+            "operator": "Equals"
+          },
+          "next-state": "escalated"
+        }
+      ]
+    },
+    {
+      "name": "escalated",
+      "type": "EVENT",
+      "events": [
+        {
+          "event-expression": {
+            "path": "$.name",
+            "value": "resolve-escalation",
+            "operator": "Equals"
+          }
+        }
+      ],
+      "next-state": "closed"
+    },
+    {
+      "name": "closed",
+      "type": "OPERATION",
+      "action-mode": "SEQUENTIAL",
+      "actions": [
+        {
+          "function": {
+            "name": "notify-resolution",
+            "type": "notification",
+            "parameters": [
+              {
+                "name": "recipient",
+                "path": "$.requester"
+              },
+              {
+                "name": "caseNumber",
+                "path": "$.id"
+              },
+              {
+                "name": "resolution",
+                "path": "$.resolution"
+              }
+            ]
+          }
+        }
+      ],
+      "end": true
+    }
+  ]
+}

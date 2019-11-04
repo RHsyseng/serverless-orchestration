@@ -1,0 +1,29 @@
+{
+  "name": "simple-workflow",
+  "states": [
+    {
+      "name": "test-state",
+      "type": "OPERATION",
+      "start": true,
+      "action-mode": "SEQUENTIAL",
+      "actions": [
+        {
+          "function": {
+            "name": "testFunction",
+            "type": "someType",
+            "parameters": {
+              "one": "1",
+              "two": "two"
+            }
+          },
+          "timeout": 5
+        }
+      ],
+      "next-state": "end-state"
+    },
+    {
+      "name": "end-state",
+      "type": "END"
+    }
+  ]
+}

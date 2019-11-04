@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: simple-wf-cm-v1
+  labels:
+    workflow-name: "simple-workflow"
+    workflow-version: "1"
+data:
+  workflow.json: |
+    {
+      "name": "simple-workflow",
+      "version": "1",
+      "trigger-defs": [
+        {
+          "name": "trigger-1",
+          "source": "source-1",
+          "type": "type-1"
+        },
+        {
+          "name": "trigger-2",
+          "source": "source-1",
+          "type": "type-2"
+        },
+        {
+          "name": "trigger-3",
+          "source": "source-1",
+          "type": "type-2",
+          "correlation-token": "$.msgID"
+        },
+      ],
+      "states": [
+        {
+          "name": "test-state",
+          "type": "OPERATION",
+          "start": true,
+          "action-mode": "SEQUENTIAL",
+          "actions": [
+            {
+              "function": {
+                "name": "testFunction",
+                "type": "someType",
+                "parameters": {
+                  "one": "1",
+                  "two": "two"
+                }
+              },
+              "timeout": 5
+            }
+          ],
+          "next-state": "end-state"
+        },
+        {
+          "name": "end-state",
+          "type": "END"
+        }
+      ]
+    }
