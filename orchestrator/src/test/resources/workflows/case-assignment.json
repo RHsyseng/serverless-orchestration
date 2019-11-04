@@ -45,7 +45,24 @@
       "name": "open",
       "type": "OPERATION",
       "action-mode": "SEQUENTIAL",
+      "filter": {
+        "input-path": "$.subject",
+        "result-path": "$",
+        "output-path": "$.assignee"
+      },
       "actions": [
+        {
+          "function": {
+            "name": "find-candidate",
+            "type": "aws",
+            "parameters": [
+              {
+                "name": "resource",
+                "value": "arn:aws:lambda:REGION:ACCOUNT_ID:function:search-candidate"
+              }
+            ]
+          }
+        }
       ],
       "next-state": "assigned"
     },
